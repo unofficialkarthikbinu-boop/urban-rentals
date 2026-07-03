@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Registration Approved - Urban Rentals</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #1f2937; line-height: 1.6; }
+        .container { max-width: 650px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .header { background-color: #ffffff; padding: 40px 30px; text-align: center; border-bottom: 3px solid #0ea5e9; }
+        .logo { font-size: 24px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 8px 0; }
+        .sub-header { color: #64748b; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+        .content { padding: 40px 30px; }
+        .success-box { background-color: #edfff5; border: 1px solid #d1fae5; color: #065f46; padding: 20px; border-radius: 6px; text-align: center; margin-bottom: 30px; font-weight: 600; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+        .success-icon { font-size: 24px; margin-right: 12px; }
+
+        .welcome-section { text-align: left; margin-bottom: 40px; }
+        .welcome-title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 15px; }
+        .welcome-text { margin-bottom: 24px; color: #4b5563; font-size: 16px; }
+
+        .steps-box { background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 25px; margin-bottom: 30px; }
+        .steps-title { font-size: 14px; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 1px; margin-bottom: 15px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; }
+        .step-item { display: flex; align-items: flex-start; margin-bottom: 16px; }
+        .step-number { width: 28px; height: 28px; background-color: #0ea5e9; color: white; border-radius: 50%; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-right: 12px; flex-shrink: 0; }
+        .step-content { flex: 1; }
+        .step-heading { font-weight: 600; color: #1e293b; display: block; margin-bottom: 4px; font-size: 15px; }
+        .step-desc { font-size: 13px; color: #64748b; }
+
+        .btn-container { text-align: center; margin-top: 40px; }
+        .btn { display: inline-block; background-color: #0f172a; color: #ffffff; padding: 14px 32px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 16px; transition: background-color 0.2s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn:hover { background-color: #334155; }
+
+        .footer { background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb; }
+        .footer p { font-size: 12px; color: #94a3b8; margin: 4px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">Urban Rentals</h1>
+            <div class="sub-header">PARTNER VERIFICATION</div>
+        </div>
+
+        <div class="content">
+            <!-- Alert -->
+            <div class="success-box">
+                <span class="success-icon">✓</span>
+                Application Approved Successfully
+            </div>
+
+            <!-- Welcome -->
+            <div class="welcome-section">
+                <h2 class="welcome-title">Welcome Aboard, {{ vendor.name }}!</h2>
+                <p class="welcome-text">
+                    We are thrilled to verify your vendor account. Your documents have been reviewed and approved by our team. You are now an official partner of UrbanRentals.
+                </p>
+                <p class="welcome-text">
+                    This marks the beginning of a great partnership. You can now access your vendor dashboard to manage inventory, track orders, and grow your business.
+                </p>
+            </div>
+
+            <!-- Getting Started Steps -->
+            <div class="steps-box">
+                <div class="steps-title">Next Steps</div>
+                <div class="step-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <span class="step-heading">Log In to Dashboard</span>
+                        <span class="step-desc">Access your secure vendor portal using your registered credentials.</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <span class="step-heading">List Your Products</span>
+                        <span class="step-desc">Add product details, high-quality images, and competitive pricing.</span>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <span class="step-heading">Start Earning</span>
+                        <span class="step-desc">Reach thousands of customers looking for quality rentals.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="btn-container">
+                <a href="{{ login_url }}" class="btn">Go to Vendor Dashboard</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>Need assistance? Contact our Partner Support Team.</p>
+            <p><a href="mailto:partners@urbanrentals.com" style="color: #0ea5e9; text-decoration: none;">partners@urbanrentals.com</a></p>
+            <p>&copy; {% now "Y" %} Urban Rentals. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

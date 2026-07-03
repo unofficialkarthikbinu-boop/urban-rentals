@@ -1,0 +1,54 @@
+{% load static %}
+{% include "Admin/header.html" %}
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Edit Subcategory</h4>
+                        <p class="card-description">
+                            Update subcategory details
+                        </p>
+
+                        <form class="forms-sample" method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="form-group mb-3">
+                                <label for="subcategoryName" class="form-label">Subcategory Name</label>
+                                <input type="text" class="form-control" id="subcategoryName" name="subcategory_name" value="{{ subcategory.subcategory_name }}" placeholder="Subcategory Name" required pattern="[A-Z][a-zA-Z\s]*" title="Name must start with a capital letter and contain only letters and spaces">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="categorySelect" class="form-label">Category</label>
+                                <select class="form-select" id="categorySelect" name="category_id" required>
+                                    <option value="" disabled>-- Select Category --</option>
+                                    {% for cat in categories %}
+                                        <option value="{{ cat.category_id }}" {% if cat.category_id == subcategory.category_id %}selected{% endif %}>
+                                            {{ cat.category_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="4">{{ subcategory.description|default:"" }}</textarea>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="subcategoryImage" class="form-label">Subcategory Image</label>
+                                {% if subcategory.subcategory_image %}
+                                    <div class="mb-2">
+                                        <img src="{{ subcategory.subcategory_image.url }}" alt="Current Image" class="img-thumbnail" style="width: 150px;">
+                                    </div>
+                                {% endif %}
+                                <input type="file" class="form-control" id="subcategoryImage" name="subcategory_image" accept="image/*">
+                            </div>
+                            <button type="submit" class="btn btn-primary me-2">Update</button>
+                            <a href="{% url 'viewsubcategory' %}" class="btn btn-light">Cancel</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "Admin/footer.html" %}
+</div>

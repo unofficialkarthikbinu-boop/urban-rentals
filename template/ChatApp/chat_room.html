@@ -1,0 +1,220 @@
+{% load static %}
+{% if user_type == 'customer' %}
+    {% include "Customer/header.html" %}
+{% else %}
+    {% include "Vendor/header.html" %}
+{% endif %}
+
+<main id="main" class="main" style="padding-top: 100px;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-10 col-lg-8">
+                <div class="card shadow rounded-4 border-0 overflow-hidden">
+                    <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between py-3 px-4">
+                        <div class="d-flex align-items-center">
+                            {% if other_user_image %}
+                                <img src="{{ other_user_image }}" class="rounded-circle me-3 border border-2 border-white" width="45" height="45" style="object-fit: cover;" alt="Avatar">
+                            {% else %}
+                                <div class="rounded-circle bg-white text-primary d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                    <i class="bi bi-person-fill h4 mb-0"></i>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <h5 class="mb-0 fw-bold">{{ other_user_name }}</h5>
+                                <small class="opacity-75">Online</small>
+                            </div>
+                        </div>
+                        <a href="{% url 'list_chats' %}" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                            <i class="bi bi-arrow-left me-1"></i>Back
+                        </a>
+                    </div>
+
+                    <div class="card-body p-0 position-relative">
+                        <!-- Chat Background Pattern -->
+                        <div class="position-absolute w-100 h-100" style="background-color: #e5ddd5; opacity: 0.3; background-image: radial-gradient(#adb5bd 1px, transparent 1px); background-size: 20px 20px; pointer-events: none;"></div>
+
+                        <div id="chat-messages" class="p-4" style="height: 500px; overflow-y: auto; overflow-x: hidden; position: relative;">
+                            <!-- Messages will be loaded here -->
+                            <div class="d-flex justify-content-center align-items-center h-100 text-muted">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light py-3 px-4 border-top">
+                        <form id="chat-form" onsubmit="sendMessage(event)">
+                            <div class="input-group input-group-lg shadow-sm rounded-pill overflow-hidden">
+                                <input type="text" id="message-input" class="form-control border-0 px-4" placeholder="Type a message..." required autocomplete="off">
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-send-fill fs-5"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% if user_type == 'customer' %}
+    {% include "Customer/footer.html" %}
+{% else %}
+    {% include "Vendor/footer.html" %}
+{% endif %}
+
+<script>
+    const roomId = "{{ chat_room.id }}";
+    const currentUserType = "{{ user_type }}";
+    let lastMessageId = 0;
+    const chatBox = document.getElementById('chat-messages');
+
+    function scrollToBottom() {
+        chatBox.scrollTo({
+            top: chatBox.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
+
+    function formatTime(timestamp) {
+        // You can add more complex formatting if needed
+        return timestamp; 
+    }
+
+    function appendMessage(msg) {
+        const isMe = msg.sender_type === currentUserType;
+        const alignClass = isMe ? 'justify-content-end' : 'justify-content-start';
+        const bubbleColor = isMe ? 'background-color: #dcf8c6;' : 'background-color: #fff;';
+        
+        const html = `
+            <div class="d-flex ${alignClass} mb-3 fade-in w-100">
+                <div class="message-bubble shadow-sm px-3 py-2 rounded-3" 
+                     style="max-width: 75%; ${bubbleColor} border-top-${isMe ? 'right' : 'left'}-radius: 0;">
+                    <p class="mb-1 text-break text-dark" style="font-size: 0.95rem; line-height: 1.4;">${msg.content}</p>
+                    <div class="d-flex justify-content-end align-items-center gap-1">
+                        <small class="text-secondary" style="font-size: 0.7rem;">${msg.timestamp}</small>
+                        ${isMe ? '<i class="bi bi-check2-all text-primary" style="font-size: 0.8rem;"></i>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        chatBox.appendChild(div.firstElementChild);
+    }
+
+    async function fetchMessages() {
+        try {
+            const response = await fetch(`/chat/get_messages/${roomId}/?last_id=${lastMessageId}`);
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            
+            if (data.messages && data.messages.length > 0) {
+                if (lastMessageId === 0) chatBox.innerHTML = ''; // Clear spinner/initial state
+                
+                data.messages.forEach(msg => {
+                    if (msg.id > lastMessageId) {
+                        appendMessage(msg);
+                        lastMessageId = msg.id;
+                    }
+                });
+                scrollToBottom();
+            } else if (lastMessageId === 0) {
+                 chatBox.innerHTML = `
+                    <div class="text-center mt-5 opacity-75">
+                        <div class="bg-light d-inline-block rounded-circle p-3 mb-3">
+                            <i class="bi bi-chat-heart text-primary display-4"></i>
+                        </div>
+                        <p class="text-muted fw-bold">No messages yet.</p>
+                        <p class="text-muted small">Start the conversation!</p>
+                    </div>
+                 `;
+            }
+        } catch (error) {
+            console.error('Error fetching messages:', error);
+        }
+    }
+
+    async function sendMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById('message-input');
+        const content = input.value.trim();
+        
+        if (!content) return;
+
+        input.value = '';
+        input.focus();
+        
+        try {
+            const formData = new FormData();
+            formData.append('content', content);
+            const csrfToken = getCookie('csrftoken'); 
+            
+            const response = await fetch(`/chat/send_message/${roomId}/`, {
+                method: 'POST',
+                headers: { 'X-CSRFToken': csrfToken },
+                body: formData
+            });
+            
+            const data = await response.json();
+            if (data.status === 'success') {
+                fetchMessages();
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Initial load
+    fetchMessages();
+    
+    // Polling interval
+    const pollInterval = setInterval(fetchMessages, 2000); // 2 seconds
+
+    // Clean up on page unload
+    window.addEventListener('beforeunload', () => {
+        clearInterval(pollInterval);
+    });
+</script>
+
+<style>
+    .fade-in {
+        animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    #chat-messages::-webkit-scrollbar {
+        width: 6px;
+    }
+    #chat-messages::-webkit-scrollbar-track {
+        background: transparent; 
+    }
+    #chat-messages::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.1); 
+        border-radius: 3px;
+    }
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+        background: rgba(0,0,0,0.2); 
+    }
+</style>

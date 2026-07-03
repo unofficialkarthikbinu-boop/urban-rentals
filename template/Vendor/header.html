@@ -1,0 +1,239 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Index - Impact Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'vendor/assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'vendor/assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'vendor/assets/css/main.css' %}" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: Impact
+  * Template URL: https://bootstrapmade.com/impact-bootstrap-business-website-template/
+  * Updated: Aug 07 2024 with Bootstrap v5.3.3
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="index-page">
+
+  <!-- Defined Vendor Theme in Header  -->
+  <style>
+    :root {
+      /* Vendor Professional Theme */
+      --vendor-primary: #0B2447;      /* Deep Midnight Blue */
+      --vendor-secondary: #19376D;    /* Dark Navy Blue */
+      --vendor-accent: #576CBC;       /* Periwinkle Blue */
+      --vendor-light: #A5D7E8;        /* Light Ice Blue */
+      --vendor-bg: #f0f2f5;           /* Light Grey Background */
+      --vendor-surface: #ffffff;
+      --vendor-card-bg: #ffffff;      /* Card Background */
+      
+      /* Overriding Bootstrap Variables where possible via class overrides */
+    }
+
+    /* Global Body Background */
+    body {
+      background-color: var(--vendor-bg) !important;
+      color: var(--vendor-text);
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    main#main {
+      display: block;
+      width: 100%;
+      background-color: var(--vendor-bg);
+    }
+
+    .section, .dashboard-section {
+      display: block;
+      width: 100%;
+      background-color: var(--vendor-bg);
+    }
+
+    .container {
+      display: block;
+      width: 100%;
+    }
+
+    /* Header Styling */
+    #header {
+      background: var(--vendor-primary) !important;
+      color: #fff !important;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+    }
+    
+    .topbar {
+        background: #06142e !important; /* Darker shade of primary */
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .branding, .navmenu {
+        background: var(--vendor-primary) !important;
+    }
+
+    .navmenu a {
+        color: rgba(255,255,255,0.85) !important;
+        font-weight: 500;
+    }
+
+    .navmenu a:hover, .navmenu a.active {
+        color: #fff !important;
+    }
+
+    .sitename {
+        color: #fff !important;
+    }
+
+    /* Button Standardization */
+    .btn-primary {
+        background-color: var(--vendor-secondary) !important;
+        border-color: var(--vendor-secondary) !important;
+    }
+    .btn-primary:hover {
+        background-color: #0b5ed7 !important;
+    }
+
+    .btn-outline-primary {
+        color: var(--vendor-secondary) !important;
+        border-color: var(--vendor-secondary) !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: var(--vendor-secondary) !important;
+        color: #fff !important;
+    }
+    
+    .btn-add-product {
+        background-color: var(--vendor-secondary) !important;
+        color: white !important;
+        border-radius: 50px !important;
+        padding: 8px 20px !important;
+        font-weight: 500;
+        transition: 0.3s;
+    }
+    .btn-add-product:hover {
+        background-color: #0b5ed7 !important;
+        transform: translateY(-2px);
+    }
+
+    /* Dashboard Cards */
+    .dashboard-card, .card {
+        border: none !important;
+        border-radius: 12px !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+        background: var(--vendor-card-bg) !important;
+    }
+
+    .section-header {
+      border-bottom: 1px solid #edf2f4 !important;
+    }
+    
+    .card-title-styled {
+       color: var(--vendor-primary) !important;
+    }
+
+    /* Sidebar - ensuring it follows theme */
+    .dashboard-sidebar {
+        background-color: #fff !important;
+        border: none !important;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+    }
+
+    .user-avatar { 
+        background: linear-gradient(135deg, var(--vendor-primary), var(--vendor-accent)) !important; 
+        color: white !important;
+    }
+    
+    .nav-link-dashboard.active {
+        background-color: #edf2f4 !important;
+        color: var(--vendor-primary) !important;
+        border-left: 3px solid var(--vendor-primary) !important;
+    }
+    
+    .nav-link-dashboard:hover {
+        color: var(--vendor-primary) !important;
+    }
+
+    /* Table Styling */
+    .table thead th {
+        background-color: #f8f9fa !important;
+        color: #6c757d !important;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        border-bottom: 2px solid #edf2f4;
+    }
+  </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header fixed-top">
+
+    <div class="topbar d-flex align-items-center">
+      <div class="container d-flex justify-content-center justify-content-md-between">
+        <div class="contact-info d-flex align-items-center">
+          <i class="bi bi-envelope d-flex align-items-center"><a href="mailto:contact@example.com">urbanrentalsofficial@gmail.com</a></i>
+          <i class="bi bi-phone d-flex align-items-center ms-4"><span>+91 8075290167</span></i>
+        </div>
+        <div class="social-links d-none d-md-flex align-items-center">
+          <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+    </div><!-- End Top Bar -->
+
+    <div class="branding d-flex align-items-center">
+
+      <div class="container position-relative d-flex align-items-center justify-content-between">
+        <a href="{% url 'vendor_home' %}" class="logo d-flex align-items-center text-decoration-none">
+          <!-- <img src="assets/img/logo.png" alt=""> -->
+          <h1 class="sitename">UrbanRentals</h1>
+          <span class="text-white opacity-50 small ms-2 d-none d-sm-inline">Vendor</span>
+        </a>
+
+        <nav id="navmenu" class="navmenu">
+          <ul>
+            <li><a href="{% url 'vendor_home' %}">Dashboard</a></li>
+            <li><a href="{% url 'vendor_products' %}">My Products</a></li>
+            <li><a href="{% url 'vendor_orders' %}" class="">My Orders</a></li>
+            <li><a href="{% url 'vendor_return_requests' %}" class="">Return Requests</a></li>
+            <li><a href="{% url 'vendor_report' %}">Sales Report</a></li>
+            <li class="ms-lg-4 text-white-50 d-none d-lg-block">|</li>
+            <li><a href="{% url 'vendor_profile' %}" class="ms-lg-3"><i class="bi bi-person-circle fs-5 me-2"></i> Profile</a></li>
+            <li><a href="{% url 'logout' %}" style="opacity:0.8"><i class="bi bi-box-arrow-right fs-5"></i></a></li>
+          </ul>
+          <i class="mobile-nav-toggle d-xl-none bi bi-list text-white"></i>
+        </nav>
+
+      </div>
+
+    </div>
+
+  </header>

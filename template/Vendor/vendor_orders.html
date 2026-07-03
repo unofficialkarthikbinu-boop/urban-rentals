@@ -1,0 +1,385 @@
+{% load static %}
+{% include 'Vendor/header.html' %}
+
+<main id="main">
+  <style>
+    /* Specific styles for Orders Dashboard */
+    .dashboard-container {
+        padding-top: 120px;
+        min-height: 80vh;
+        padding-bottom: 2rem;
+    }
+
+    /* Page Header to match theme */
+    .page-header {
+      background: linear-gradient(135deg, var(--vendor-primary) 0%, var(--vendor-secondary) 100%);
+      color: #0B2447;
+      padding: 3rem 2rem;
+      margin-bottom: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px -10px rgba(11, 36, 71, 0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .page-header h1 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 2.2rem;
+      position: relative;
+      z-index: 1;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+    }
+
+    .page-header h1 i {
+      color: #ffffff;
+    }
+
+    .page-header p {
+      opacity: 0.95;
+      font-size: 1.1rem;
+      margin-bottom: 0;
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      color: rgba(255, 255, 255, 0.95);
+    }
+    
+    /* Repurpose previous styles into scoped layout */
+    .dashboard-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #edf2f4;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05); /* Soft consistent shadow */
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+
+    .card-header-custom {
+      background: #fff;
+      border-bottom: 1px solid #f0f0f0;
+      padding: 1.5rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title-custom {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--vendor-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    /* Filters */
+    .filter-wrapper {
+      background: #f8f9fa;
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid #edf2f4;
+    }
+
+    .form-select-custom {
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+      box-shadow: none;
+      transition: all 0.2s;
+    }
+
+    .form-select-custom:focus {
+      border-color: var(--vendor-accent);
+      box-shadow: 0 0 0 0.2rem rgba(87, 108, 188, 0.15);
+    }
+
+    /* Table Styles */
+    .table-custom {
+      margin-bottom: 0;
+    }
+
+    .table-custom th {
+      background-color: #f8f9fa;
+      color: #6c757d;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      padding: 1rem 1.5rem;
+      border-bottom: 2px solid #edf2f4;
+      border-top: none;
+    }
+
+    .table-custom td {
+      padding: 1.2rem 1.5rem;
+      vertical-align: middle;
+      border-bottom: 1px solid #f0f0f0;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+    
+    .table-custom tr:hover td {
+        background-color: #f8f9fa;
+    }
+
+    .table-custom tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* Badges */
+    .status-badge {
+      padding: 0.5em 1em;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      display: inline-block;
+      min-width: 90px;
+      text-align: center;
+    }
+
+    .status-pending { background-color: #fff3cd; color: #856404; }
+    .status-confirmed { background-color: #d1e7dd; color: #0f5132; }
+    .status-paid { background-color: #cff4fc; color: #055160; }
+    .status-return_requested { background-color: #fff3cd; color: #856404; }
+    .status-completed { background-color: #d1e7dd; color: #198754; }
+    .status-cancelled { background-color: #f8d7da; color: #842029; }
+    .status-refunded { background-color: #e2e3e5; color: #41464b; }
+
+    /* Action Buttons */
+    .btn-action {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      background: #fff;
+      border: 1px solid #dee2e6;
+      transition: all 0.2s;
+      margin: 0 0.2rem;
+      text-decoration: none;
+    }
+
+    .btn-action:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.08);
+    }
+
+    .btn-view:hover { color: var(--vendor-secondary); border-color: var(--vendor-secondary); background: #f0f7ff; }
+    .btn-check:hover { color: #198754; border-color: #198754; background: #e8f5e9; }
+    .btn-delete:hover { color: #dc3545; border-color: #dc3545; background: #fef2f2; }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 5rem 2rem;
+    }
+    
+    .empty-state-icon {
+      font-size: 5rem;
+      color: #dee2e6;
+      margin-bottom: 1.5rem;
+    }
+
+    .empty-state h3 {
+      font-weight: 700;
+      color: var(--vendor-primary);
+      margin-bottom: 0.5rem;
+    }
+    
+    /* Customer Info */
+    .customer-info strong {
+      display: block;
+      color: var(--vendor-primary);
+      font-size: 0.95rem;
+    }
+    
+    .customer-info small {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+
+    .order-number {
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: var(--vendor-accent);
+      background: #f0f2f5;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+    }
+    
+    .order-amount {
+      font-weight: 700;
+      color: var(--vendor-primary);
+      font-size: 1rem;
+    }
+
+    /* Section Display*/
+    main#main {
+      display: block;
+      width: 100%;
+      background-color: var(--vendor-bg);
+    }
+
+    .dashboard-container {
+      display: block;
+      width: 100%;
+    }
+  </style>
+
+  <div class="container dashboard-container">
+    <!-- Page Header -->
+    <div class="page-header px-4 py-5">
+      <div>
+        <h1><i class="bi bi-bag-check-fill me-3"></i>Manage Orders</h1>
+        <p>Monitor your sales, verify pending orders, and track fulfillment status seamlessly.</p>
+      </div>
+    </div>
+
+    <!-- Alerts -->
+    {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4 rounded-3" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="dashboard-card">
+        <div class="card-header-custom">
+          <h2 class="card-title-custom">
+            <i class="bi bi-list-columns-reverse text-primary"></i> Order List
+          </h2>
+          <!-- Could add export buttons here -->
+        </div>
+
+        <!-- Filter Section -->
+        <div class="filter-wrapper">
+          <form method="GET" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="col-form-label fw-bold text-secondary text-uppercase small ls-1"><i class="bi bi-funnel me-2"></i>Filter Status:</label>
+            </div>
+            <div class="col-auto">
+              <select name="status" class="form-select form-select-custom" onchange="this.form.submit()">
+                <option value="">All Orders</option>
+                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending Approval</option>
+                <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                <option value="paid" {% if request.GET.status == 'paid' %}selected{% endif %}>Paid</option>
+                <option value="return_requested" {% if request.GET.status == 'return_requested' %}selected{% endif %}>Return Requested</option>
+                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                <option value="cancelled" {% if request.GET.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+              </select>
+            </div>
+            {% if request.GET.status %}
+              <div class="col-auto">
+                <a href="{% url 'vendor_orders' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                  <i class="fas fa-times me-1"></i> Clear Filter
+                </a>
+              </div>
+            {% endif %}
+          </form>
+        </div>
+
+        {% if orders %}
+        <div class="table-responsive">
+          <table class="table table-custom align-middle">
+            <thead>
+              <tr>
+                <th scope="col" class="ps-4">Order ID</th>
+                <th scope="col">Customer</th>
+                <th scope="col">Date & Time</th>
+                <th scope="col">Total Amount</th>
+                <th scope="col">Status</th>
+                <th scope="col">Items</th>
+                <th scope="col" class="text-end pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for order in orders %}
+              <tr>
+                <td class="ps-4">
+                  <span class="order-number">#{{ order.order_id }}</span>
+                </td>
+                <td>
+                  <div class="customer-info">
+                    <strong>{{ order.customer.name }}</strong>
+                    <small><i class="bi bi-telephone me-1"></i>{{ order.customer.phone }}</small>
+                  </div>
+                </td>
+                <td>
+                  <div class="d-flex flex-column">
+                    <span class="fw-bold text-dark">{{ order.created_at|date:"M d, Y" }}</span>
+                    <small class="text-muted">{{ order.created_at|date:"h:i A" }}</small>
+                  </div>
+                </td>
+                <td>
+                  <span class="order-amount">₹{{ order.grand_total|floatformat:2 }}</span>
+                </td>
+                <td>
+                  <span class="status-badge status-{{ order.status|lower }}">
+                    {% if order.status == 'pending' %}
+                        <i class="bi bi-hourglass-split me-1"></i>
+                    {% elif order.status == 'confirmed' %}
+                        <i class="bi bi-check-circle me-1"></i>
+                    {% endif %}
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark border rounded-pill px-3 py-2 fw-normal">
+                    <i class="bi bi-box me-1"></i> {{ order.items_count }} Items
+                  </span>
+                </td>
+                <td class="text-end pe-4">
+                   <div class="d-flex justify-content-end gap-1">
+                      <a href="{% url 'order_details' order.order_id %}" class="btn-action btn-view" title="View Full Details">
+                        <i class="bi bi-eye"></i>
+                      </a>
+                      
+                      {% if order.status == 'pending' %}
+                         <form method="POST" action="{% url 'accept_order' order.order_id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-action btn-check" title="Accept Order" onclick="return confirm('Accept this order?')">
+                                <i class="bi bi-check-lg"></i>
+                            </button>
+                         </form>
+
+                         <form method="POST" action="{% url 'reject_order' order.order_id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-action btn-delete" title="Reject Order" onclick="return confirm('Reject this order?')">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                         </form>
+                      {% endif %}
+                   </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+
+        {% else %}
+          <div class="empty-state">
+            <div class="empty-state-icon">
+              <i class="bi bi-inbox"></i>
+            </div>
+            <h3>No Orders Found</h3>
+            <p class="text-muted mb-4">No specific orders found matching your criteria.</p>
+            <a href="{% url 'vendor_orders' %}" class="btn btn-outline-primary rounded-pill px-4">Reset Filters</a>
+          </div>
+        {% endif %}
+      </div>
+  </div>
+</main>
+
+{% include 'Vendor/footer.html' %}

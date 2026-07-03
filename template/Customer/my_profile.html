@@ -1,0 +1,273 @@
+{% extends 'customer/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    /* Dashboard Layout */
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding-top: 3rem;
+        padding-bottom: 5rem;
+    }
+
+    /* Sidebar Styling */
+    .dashboard-sidebar {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2rem 1.5rem;
+        position: sticky;
+        top: 100px;
+    }
+
+    .user-brief {
+        text-align: center;
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        background: #f8f9fa;
+        color: #212529;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin: 0 auto 1rem;
+        font-weight: 500;
+        border: 2px solid #e9ecef;
+    }
+
+    .nav-link-dashboard {
+        display: flex;
+        align-items: center;
+        padding: 0.8rem 1rem;
+        color: #495057;
+        border-radius: 8px;
+        transition: all 0.2s;
+        margin-bottom: 0.25rem;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .nav-link-dashboard:hover {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+    .nav-link-dashboard.active {
+        background-color: #e9ecef;
+        color: #000;
+        font-weight: 600;
+    }
+
+    .nav-link-dashboard i {
+        margin-right: 12px;
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Main Content Styling */
+    .dashboard-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid #f1f3f5;
+    }
+
+    .card-header-styled {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .card-title-styled {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
+        color: #212529;
+    }
+
+    .data-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .data-label {
+        color: #868e96;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .data-value {
+        font-size: 1.05rem;
+        color: #212529;
+        font-weight: 500;
+    }
+
+    .document-box {
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .doc-icon {
+        font-size: 2rem;
+        color: #495057;
+        margin-right: 1rem;
+    }
+
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-pill.success { background: #d3f9d8; color: #2b8a3e; }
+    .status-pill.warning { background: #fff3bf; color: #f08c00; }
+    .status-pill.danger { background: #ffe3e3; color: #c92a2a; }
+
+</style>
+
+<div class="bg-light min-vh-100">
+    <div class="dashboard-container container">
+        <div class="row g-4">
+            
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-3">
+                <div class="dashboard-sidebar">
+                    <div class="user-brief">
+                        <div class="user-avatar text-uppercase">
+                            {{ customer.name|slice:":1" }}
+                        </div>
+                        <h5 class="mb-1 fw-bold">{{ customer.name }}</h5>
+                        <div class="text-muted small mb-2">{{ customer.email }}</div>
+                        <span class="status-pill {% if customer.status == 'Approved' %}success{% elif customer.status == 'Pending' %}warning{% else %}danger{% endif %}">
+                            {{ customer.status|default:'Active' }}
+                        </span>
+                    </div>
+
+                    <nav class="nav flex-column">
+                        <a href="{% url 'customer_profile' %}" class="nav-link-dashboard active">
+                            <i class="bi bi-person"></i> Personal Info
+                        </a>
+                        <a href="{% url 'my_orders' %}" class="nav-link-dashboard">
+                            <i class="bi bi-box-seam"></i> My Orders
+                        </a>
+                        <a href="{% url 'list_chats' %}" class="nav-link-dashboard">
+                            <i class="bi bi-chat-dots"></i> Vendor Chats
+                        </a>
+                        <a href="{% url 'delivery_details' %}" class="nav-link-dashboard">
+                            <i class="bi bi-geo-alt"></i> Addresses
+                        </a>
+                        <a href="{% url 'view_cart' %}" class="nav-link-dashboard">
+                            <i class="bi bi-cart"></i> Cart
+                        </a>
+                        <hr class="my-2 border-secondary-subtle">
+                        <a href="{% url 'logout' %}" class="nav-link-dashboard text-danger">
+                            <i class="bi bi-box-arrow-right"></i> Sign Out
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-lg-9">
+                <!-- Personal Info Card -->
+                <div class="dashboard-card">
+                    <div class="card-header-styled">
+                        <h2 class="card-title-styled">Personal Information</h2>
+                        <a href="{% url 'edit_customer_profile' %}" class="btn btn-outline-dark btn-sm rounded-pill px-3">
+                            <i class="bi bi-pencil me-1"></i> Edit Details
+                        </a>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="data-group">
+                                <div class="data-label">Full Name</div>
+                                <div class="data-value">{{ customer.name }}</div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="data-group">
+                                <div class="data-label">Email Address</div>
+                                <div class="data-value">{{ customer.email }}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="data-group">
+                                <div class="data-label">Phone Number</div>
+                                <div class="data-value">{{ customer.phone }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address & Documents Grid -->
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header-styled mb-3">
+                                <h2 class="card-title-styled">Current Location</h2>
+                            </div>
+                            <div class="data-group mb-0">
+                                <div class="data-label mb-2">Primary Address</div>
+                                <div class="data-value mb-2">{{ customer.address }}</div>
+                                <div class="text-muted small">
+                                    <i class="bi bi-geo-alt me-1"></i>
+                                    {{ customer.location_id.location_name }}, {{ customer.district_id.district_name }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="dashboard-card h-100">
+                            <div class="card-header-styled mb-3">
+                                <h2 class="card-title-styled">Verification</h2>
+                            </div>
+                            <div class="document-box">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person-badge doc-icon"></i>
+                                    <div>
+                                        <div class="fw-bold text-dark">ID Proof</div>
+                                        <div class="small text-muted">
+                                            {% if customer.id_proof %}Document Uploaded{% else %}Not Provided{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% if customer.id_proof %}
+                                <a href="{{ customer.id_proof.url }}" target="_blank" class="btn btn-sm btn-light border">
+                                    View
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

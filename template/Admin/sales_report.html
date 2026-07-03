@@ -1,0 +1,74 @@
+{% load static %}
+{% include "Admin/header.html" %}
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-lg-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Sales Report</h4>
+                        
+                        <form method="get" action="" class="form-inline mb-4">
+                            <div class="form-group mr-2">
+                                <label for="from_date" class="mr-2">From Date:</label>
+                                <input type="date" class="form-control" name="from_date" value="{{ from_date }}">
+                            </div>
+                            <div class="form-group mr-2">
+                                <label for="to_date" class="mr-2">To Date:</label>
+                                <input type="date" class="form-control" name="to_date" value="{{ to_date }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                            <a href="{% url 'admin_sales_report_export' %}?from_date={{ from_date }}&to_date={{ to_date }}" class="btn btn-success">Export to Excel</a>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Total Rent</th>
+                                        <th>Deposit</th>
+                                        <th>Grand Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.order_number }}</td>
+                                        <td>{{ order.customer.name }}</td>
+                                        <td>{{ order.created_at|date:"Y-m-d" }}</td>
+                                        <td>
+                                            {% if order.status == 'completed' %}
+                                                <label class="badge badge-success">{{ order.get_status_display }}</label>
+                                            {% elif order.status == 'pending' %}
+                                                <label class="badge badge-warning">{{ order.get_status_display }}</label>
+                                            {% elif order.status == 'cancelled' %}
+                                                <label class="badge badge-danger">{{ order.get_status_display }}</label>
+                                            {% else %}
+                                                <label class="badge badge-info">{{ order.get_status_display }}</label>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ order.total_rent }}</td>
+                                        <td>{{ order.total_security_deposit }}</td>
+                                        <td>{{ order.grand_total }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="7" class="text-center">No orders found</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "Admin/footer.html" %}

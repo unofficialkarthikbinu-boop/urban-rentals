@@ -1,0 +1,1444 @@
+ÿþfrom django.shortcuts import render, redirect
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from GuestApp.models import tbl_login, tbl_vendor
+from AdminApp.models import tbl_district, tbl_location, tbl_categorys, tbl_subcategory
+from VendorApp.models import tbl_product, tbl_furniture_details, tbl_appliance_details, tbl_product_image
+from CustomerApp.models import tbl_order, tbl_order_item, tbl_return_request
+from decimal import Decimal
+from datetime import datetime
+
+# Create your views here.
+def vendor_home(request):
+    return render(request, 'vendor/index.html')
+
+def my_profile(request):
+    """Vendor Profile View"""
+    try:
+        # Get vendor ID from session
+        vendor_login_id = request.session.get('vendor')
+        if not vendor_login_id:
+            return redirect('login')
+            
+        vendor = tbl_vendor.objects.get(login_id=vendor_login_id)
+        
+        context = {
+            'vendor': vendor
+        }
+        return render(request, 'vendor/my_profile.html', context)
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+
+
+
+# ======================== PRODUCT MANAGEMENT ========================
+
+def add_product(request):
+    """Add new product for rent"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+    if request.method == 'POST':
+        # Basic Product Fields
+        category_id = request.POST.get('category')
+        subcategory_id = request.POST.get('subcategory')
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        brand = request.POST.get('brand')
+        rent_price_per_day = request.POST.get('rent_price_per_day')
+        rent_price_per_month = request.POST.get('rent_price_per_month')
+        security_deposit = request.POST.get('security_deposit')
+        stock_quantity = request.POST.get('stock_quantity')
+        product_image = request.FILES.get('product_image')
+        
+        # Furniture Details
+        furniture_type = request.POST.get('furniture_type')
+        furniture_size = request.POST.get('furniture_size')
+        furniture_thickness = request.POST.get('furniture_thickness')
+        furniture_material = request.POST.get('furniture_material')
+        furniture_features = request.POST.get('furniture_features')
+        
+        # Appliance Details
+        appliance_type = request.POST.get('appliance_type')
+        appliance_power_rating = request.POST.get('appliance_power_rating')
+        appliance_voltage = request.POST.get('appliance_voltage')
+        appliance_warranty = request.POST.get('appliance_warranty')
+
+        # Validation
+        errors = []
+        if not category_id:
+            errors.append("Category is required")
+        if not subcategory_id:
+            errors.append("Subcategory is required")
+        if not product_name or len(product_name.strip()) == 0:
+            errors.append("Product name is required")
+        if not product_description or len(product_description.strip()) == 0:
+            errors.append("Description is required")
+        if not product_image:
+            errors.append("Product image is required")
+        
+        # At least one pricing option
+        if not rent_price_per_day and not rent_price_per_month:
+            errors.append("Enter at least one rental price (daily or monthly)")
+
+        # Validate prices
+        try:
+            if rent_price_per_day:
+                rent_price_per_day = float(rent_price_per_day)
+                if rent_price_per_day < 0:
+                    errors.append("Daily price cannot be negative")
+        except ValueError:
+            errors.append("Daily price must be a valid number")
+
+        try:
+            if rent_price_per_month:
+                rent_price_per_month = float(rent_price_per_month)
+                if rent_price_per_month < 0:
+                    errors.append("Monthly price cannot be negative")
+        except ValueError:
+            errors.append("Monthly price must be a valid number")
+
+        # Validate security deposit
+        try:
+            if security_deposit:
+                security_deposit = float(security_deposit)
+                if security_deposit < 0:
+                    errors.append("Security deposit cannot be negative")
+            else:
+                security_deposit = 0
+        except ValueError:
+            errors.append("Security deposit must be a valid number")
+
+        # Validate quantity
+        try:
+            stock_quantity = int(stock_quantity) if stock_quantity else 1
+            if stock_quantity <= 0:
+                errors.append("Quantity must be at least 1")
+        except ValueError:
+            errors.append("Quantity must be a valid number")
+
+        # Validate image
+        if product_image:
+            allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+            if product_image.content_type not in allowed_types:
+                errors.append("Product image must be JPEG, PNG, or WebP")
+
+        # Validate category-specific details
+        try:
+            category = tbl_categorys.objects.get(category_id=category_id)
+            # Check if furniture details are required (for Furniture category)
+            if category.category_name.lower() == 'furniture':
+                if not furniture_type:
+                    errors.append("Furniture type is required")
+                if not furniture_size:
+                    errors.append("Furniture size is required")
+                if not furniture_material:
+                    errors.append("Furniture material is required")
+            
+            # Check if appliance details are required (for Appliances category)
+            elif category.category_name.lower() == 'appliances':
+                if not appliance_type:
+                    errors.append("Appliance type is required")
+                if not appliance_power_rating:
+                    errors.append("Power rating is required")
+                if not appliance_voltage:
+                    errors.append("Voltage is required")
+        except tbl_categorys.DoesNotExist:
+            errors.append("Selected category not found")
+
+        if errors:
+            categories = tbl_categorys.objects.all()
+            for error in errors:
+                messages.error(request, error)
+            return render(request, 'Vendor/add_product.html', {
+                'categories': categories,
+                'form_data': request.POST
+            })
+
+        try:
+            category = tbl_categorys.objects.get(category_id=category_id)
+            subcategory = tbl_subcategory.objects.get(subcategory_id=subcategory_id)
+
+            # Verify subcategory belongs to selected category
+            if subcategory.category_id != int(category_id):
+                messages.error(request, "Invalid subcategory selection")
+                return redirect('add_product')
+
+            # Create product
+            product = tbl_product.objects.create(
+                vendor=vendor,
+                category=category,
+                subcategory=subcategory,
+                product_name=product_name.strip(),
+                product_description=product_description.strip(),
+                brand=brand.strip() if brand else None,
+                rent_price_per_day=rent_price_per_day if rent_price_per_day else None,
+                rent_price_per_month=rent_price_per_month if rent_price_per_month else None,
+                security_deposit=security_deposit,
+                stock_quantity=stock_quantity,
+                product_image=product_image,
+                is_available=True,
+                status='Active'
+            )
+
+            # Create furniture details if category is Furniture
+            if category.category_name.lower() == 'furniture':
+                tbl_furniture_details.objects.create(
+                    product=product,
+                    furniture_type=furniture_type.strip(),
+                    size=furniture_size.strip(),
+                    thickness=furniture_thickness.strip() if furniture_thickness else '',
+                    material=furniture_material.strip(),
+                    extra_features=furniture_features.strip() if furniture_features else None
+                )
+
+            # Create appliance details if category is Appliances
+            elif category.category_name.lower() == 'appliances':
+                tbl_appliance_details.objects.create(
+                    product=product,
+                    operation_type=appliance_type.strip(),
+                    power_rating=appliance_power_rating.strip(),
+                    voltage=appliance_voltage.strip(),
+                    warranty_period=appliance_warranty.strip() if appliance_warranty else ''
+                )
+
+            # Handle additional product images if provided
+            additional_images = request.FILES.getlist('additional_images')
+            for image in additional_images:
+                if image:
+                    tbl_product_image.objects.create(
+                        product=product,
+                        image=image
+                    )
+
+            messages.success(request, f"âS&  Product '{product_name}' added successfully!")
+            return redirect('vendor_products')
+
+        except tbl_categorys.DoesNotExist:
+            messages.error(request, "Selected category not found")
+            return redirect('add_product')
+        except tbl_subcategory.DoesNotExist:
+            messages.error(request, "Selected subcategory not found")
+            return redirect('add_product')
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Error adding product: {error_details}")  # Print to console for debugging
+            messages.error(request, f"Error adding product: {str(e)}")
+            return redirect('add_product')
+
+    categories = tbl_categorys.objects.all()
+    return render(request, 'Vendor/add_product.html', {
+        'categories': categories
+    })
+
+
+def vendor_products(request):
+    """Display vendor's products"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        products = tbl_product.objects.filter(vendor=vendor)
+        return render(request, 'Vendor/products.html', {
+            'products': products,
+            'vendor': vendor
+        })
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+
+def edit_product(request, product_id):
+    """Edit an existing product"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        product = tbl_product.objects.get(product_id=product_id, vendor=vendor)
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+    except tbl_product.DoesNotExist:
+        messages.error(request, "Product not found or you don't have permission to edit it")
+        return redirect('vendor_products')
+
+    if request.method == 'POST':
+        # Get form data
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        brand = request.POST.get('brand')
+        rent_price_per_day = request.POST.get('rent_price_per_day')
+        rent_price_per_month = request.POST.get('rent_price_per_month')
+        security_deposit = request.POST.get('security_deposit')
+        stock_quantity = request.POST.get('stock_quantity')
+        product_image = request.FILES.get('product_image')
+        is_available = request.POST.get('is_available') == 'on'
+        
+        # Furniture Details
+        furniture_type = request.POST.get('furniture_type')
+        furniture_size = request.POST.get('furniture_size')
+        furniture_thickness = request.POST.get('furniture_thickness')
+        furniture_material = request.POST.get('furniture_material')
+        furniture_features = request.POST.get('furniture_features')
+        
+        # Appliance Details
+        appliance_type = request.POST.get('appliance_type')
+        appliance_power_rating = request.POST.get('appliance_power_rating')
+        appliance_voltage = request.POST.get('appliance_voltage')
+        appliance_warranty = request.POST.get('appliance_warranty')
+
+        # Validation
+        errors = []
+        if not product_name or len(product_name.strip()) == 0:
+            errors.append("Product name is required")
+        if not product_description or len(product_description.strip()) == 0:
+            errors.append("Description is required")
+        
+        # At least one pricing option
+        if not rent_price_per_day and not rent_price_per_month:
+            errors.append("Enter at least one rental price (daily or monthly)")
+
+        # Validate prices
+        try:
+            if rent_price_per_day:
+                rent_price_per_day = float(rent_price_per_day)
+                if rent_price_per_day < 0:
+                    errors.append("Daily price cannot be negative")
+        except ValueError:
+            errors.append("Daily price must be a valid number")
+
+        try:
+            if rent_price_per_month:
+                rent_price_per_month = float(rent_price_per_month)
+                if rent_price_per_month < 0:
+                    errors.append("Monthly price cannot be negative")
+        except ValueError:
+            errors.append("Monthly price must be a valid number")
+
+        # Validate security deposit
+        try:
+            if security_deposit:
+                security_deposit = float(security_deposit)
+                if security_deposit < 0:
+                    errors.append("Security deposit cannot be negative")
+            else:
+                security_deposit = 0
+        except ValueError:
+            errors.append("Security deposit must be a valid number")
+
+        # Validate quantity
+        try:
+            stock_quantity = int(stock_quantity) if stock_quantity else 1
+            if stock_quantity <= 0:
+                errors.append("Quantity must be at least 1")
+        except ValueError:
+            errors.append("Quantity must be a valid number")
+
+        # Validate image
+        if product_image:
+            allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+            if product_image.content_type not in allowed_types:
+                errors.append("Product image must be JPEG, PNG, or WebP")
+
+        if errors:
+            categories = tbl_categorys.objects.all()
+            for error in errors:
+                messages.error(request, error)
+            return render(request, 'Vendor/edit_product.html', {
+                'product': product,
+                'categories': categories,
+                'form_data': request.POST
+            })
+
+        try:
+            # Update product
+            product.product_name = product_name.strip()
+            product.product_description = product_description.strip()
+            product.brand = brand.strip() if brand else None
+            product.rent_price_per_day = rent_price_per_day if rent_price_per_day else None
+            product.rent_price_per_month = rent_price_per_month if rent_price_per_month else None
+            product.security_deposit = security_deposit
+            product.stock_quantity = stock_quantity
+            product.is_available = is_available
+            
+            if product_image:
+                product.product_image = product_image
+            
+            product.save()
+
+            # Update category-specific details
+            category = product.category
+            if category.category_name.lower() == 'furniture':
+                furniture_details, created = tbl_furniture_details.objects.get_or_create(product=product)
+                furniture_details.furniture_type = furniture_type.strip()
+                furniture_details.size = furniture_size.strip()
+                furniture_details.thickness = furniture_thickness.strip() if furniture_thickness else ''
+                furniture_details.material = furniture_material.strip()
+                furniture_details.extra_features = furniture_features.strip() if furniture_features else None
+                furniture_details.save()
+            
+            elif category.category_name.lower() == 'appliances':
+                appliance_details, created = tbl_appliance_details.objects.get_or_create(product=product)
+                appliance_details.operation_type = appliance_type.strip()
+                appliance_details.power_rating = appliance_power_rating.strip()
+                appliance_details.voltage = appliance_voltage.strip()
+                appliance_details.warranty_period = appliance_warranty.strip() if appliance_warranty else ''
+                appliance_details.save()
+
+            messages.success(request, f"âS&  Product '{product_name}' updated successfully!")
+            return redirect('vendor_products')
+
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Error updating product: {error_details}")
+            messages.error(request, f"Error updating product: {str(e)}")
+            return redirect('edit_product', product_id=product_id)
+
+    categories = tbl_categorys.objects.all()
+    
+    # Get category-specific details
+    furniture_details = None
+    appliance_details = None
+    
+    if hasattr(product, 'furniture_details'):
+        furniture_details = product.furniture_details
+    if hasattr(product, 'appliance_details'):
+        appliance_details = product.appliance_details
+    
+    return render(request, 'Vendor/edit_product.html', {
+        'product': product,
+        'categories': categories,
+        'furniture_details': furniture_details,
+        'appliance_details': appliance_details
+    })
+
+
+def delete_product(request, product_id):
+    """Delete a product"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        product = tbl_product.objects.get(product_id=product_id, vendor=vendor)
+        
+        product_name = product.product_name
+        product.delete()
+        
+        messages.success(request, f"âS&  Product '{product_name}' deleted successfully!")
+        return redirect('vendor_products')
+        
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+    except tbl_product.DoesNotExist:
+        messages.error(request, "Product not found or you don't have permission to delete it")
+        return redirect('vendor_products')
+    except Exception as e:
+        messages.error(request, f"Error deleting product: {str(e)}")
+        return redirect('vendor_products')
+
+
+def get_subcategories(request):
+    """AJAX endpoint to get subcategories by category"""
+    category_id = request.GET.get('category_id')
+    
+    if not category_id:
+        return JsonResponse({'subcategories': []})
+    
+    try:
+        subcategories = tbl_subcategory.objects.filter(
+            category_id=category_id
+        ).values('subcategory_id', 'subcategory_name')
+        return JsonResponse({
+            'subcategories': list(subcategories)
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# ======================== ORDER MANAGEMENT ========================
+
+def vendor_orders(request):
+    """Display orders for vendor's products"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to view orders")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        
+        # Get all orders containing products from this vendor
+        vendor_orders = tbl_order.objects.filter(
+            items__product__vendor=vendor
+        ).distinct().order_by('-created_at')
+        
+        # Get filter options
+        status_filter = request.GET.get('status')
+        if status_filter:
+            vendor_orders = vendor_orders.filter(status=status_filter)
+        
+        context = {
+            'vendor': vendor,
+            'orders': vendor_orders,
+            'status_choices': tbl_order.ORDER_STATUS_CHOICES,
+        }
+        
+        return render(request, 'vendor/vendor_orders.html', context)
+    
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+
+def order_details(request, order_id):
+    """Display order details with vendor's products only"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to view order details")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        order = tbl_order.objects.get(order_id=order_id)
+        
+        # Get only items from this vendor
+        vendor_items = order.items.filter(product__vendor=vendor)
+        
+        # Check if this vendor has any items in this order
+        if not vendor_items.exists():
+            messages.error(request, "You don't have access to this order")
+            return redirect('vendor_orders')
+        
+        context = {
+            'order': order,
+            'vendor_items': vendor_items,
+            'vendor': vendor,
+        }
+        
+        return render(request, 'vendor/order_details.html', context)
+    
+    except (tbl_vendor.DoesNotExist, tbl_order.DoesNotExist):
+        messages.error(request, "Order not found")
+        return redirect('vendor_orders')
+
+
+@require_http_methods(["POST"])
+def accept_order(request, order_id):
+    """Accept an order - mark as confirmed"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to accept orders")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        order = tbl_order.objects.get(order_id=order_id)
+        
+        # Check if vendor has items in this order
+        vendor_items = order.items.filter(product__vendor=vendor)
+        if not vendor_items.exists():
+            messages.error(request, "You don't have access to this order")
+            return redirect('vendor_orders')
+        
+        # Only allow accepting pending orders
+        if order.status != 'pending':
+            messages.warning(request, "Only pending orders can be accepted")
+            return redirect('order_details', order_id=order_id)
+        
+        # Update order status
+        order.status = 'confirmed'
+        order.save()
+        
+        messages.success(request, f"Order {order.order_number} accepted successfully!")
+        
+    except (tbl_vendor.DoesNotExist, tbl_order.DoesNotExist):
+        messages.error(request, "Order not found")
+    except Exception as e:
+        messages.error(request, f"Error accepting order: {str(e)}")
+    
+    return redirect('order_details', order_id=order_id)
+
+
+@require_http_methods(["POST"])
+def reject_order(request, order_id):
+    """Reject an order - mark as cancelled"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to reject orders")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        order = tbl_order.objects.get(order_id=order_id)
+        
+        # Check if vendor has items in this order
+        vendor_items = order.items.filter(product__vendor=vendor)
+        if not vendor_items.exists():
+            messages.error(request, "You don't have access to this order")
+            return redirect('vendor_orders')
+        
+        # Only allow rejecting pending orders
+        if order.status != 'pending':
+            messages.warning(request, "Only pending orders can be rejected")
+            return redirect('order_details', order_id=order_id)
+        
+        # Update order status
+        order.status = 'cancelled'
+        order.save()
+        
+        messages.success(request, f"Order {order.order_number} rejected successfully!")
+        
+    except (tbl_vendor.DoesNotExist, tbl_order.DoesNotExist):
+        messages.error(request, "Order not found")
+    except Exception as e:
+        messages.error(request, f"Error rejecting order: {str(e)}")
+    
+    return redirect('vendor_orders')
+
+# ======================== RETURN & PICKUP MANAGEMENT ========================
+
+def vendor_return_requests(request):
+    """Vendor views all return requests for their products"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor not found")
+        return redirect('vendor_home')
+    
+    try:
+        # Get return requests for this vendor's products
+        return_requests = tbl_return_request.objects.filter(
+            order_item__product__vendor=vendor
+        ).select_related('customer', 'order_item__product', 'order').order_by('-request_date')
+        
+        # Separate by status
+        pending = return_requests.filter(status='requested')
+        scheduled = return_requests.filter(status='scheduled')
+        picked_up = return_requests.filter(status='picked_up')
+        completed = return_requests.filter(status='completed')
+        
+        context = {
+            'all_returns': return_requests,
+            'pending': pending,
+            'scheduled': scheduled,
+            'picked_up': picked_up,
+            'completed': completed,
+            'page_title': 'Return & Pickup Requests'
+        }
+        return render(request, 'Vendor/return_requests.html', context)
+    except Exception as e:
+        import traceback
+        print(f"Error loading returns: {str(e)}")
+        print(traceback.format_exc())
+        messages.error(request, f"Error loading returns: {str(e)}")
+        # return redirect('vendor_home')
+        raise e
+
+
+def schedule_pickup(request, return_id):
+    """Vendor schedules pickup for a return request"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        return_req = tbl_return_request.objects.get(return_id=return_id)
+        
+        # Verify this return is for vendor's product
+        if return_req.order_item.product.vendor != vendor:
+            return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+        
+        if request.method == 'POST':
+            pickup_date = request.POST.get('pickup_scheduled_date')
+            
+            if not pickup_date:
+                return JsonResponse({'success': False, 'message': 'Please select a date'})
+            
+            # Update return request
+            return_req.pickup_scheduled_date = pickup_date
+            return_req.status = 'scheduled'
+            return_req.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Pickup scheduled for {pickup_date}'
+            })
+    except tbl_return_request.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Return request not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+
+def complete_pickup(request, return_id):
+    """Vendor completes pickup and assesses defects"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        return_req = tbl_return_request.objects.get(return_id=return_id)
+        
+        # Verify authorization
+        if return_req.order_item.product.vendor != vendor:
+            messages.error(request, "Unauthorized")
+            return redirect('vendor_home')
+        
+        if request.method == 'POST':
+            # Defect assessment
+            defect_status = request.POST.get('defect_status', 'no_defect')
+            defect_description = request.POST.get('defect_description', '')
+            defect_image = request.FILES.get('defect_image')
+            actual_return_date = request.POST.get('actual_return_date')
+            
+            # Update return request
+            return_req.defect_status = defect_status
+            return_req.defect_description = defect_description if defect_description else None
+            if defect_image:
+                return_req.defect_image = defect_image
+            
+            # Set actual return date
+            if actual_return_date:
+                return_req.actual_return_date = actual_return_date
+            
+            # Calculate deductions
+            return_req.calculate_deductions(extra_day_percentage=5)
+            
+            # Mark as picked up
+            return_req.pickup_completed_date = datetime.now()
+            return_req.status = 'completed'
+            return_req.save()
+            
+            messages.success(request, f"Return {return_id} completed. Refund: â ¹{return_req.refund_amount}")
+            return redirect('vendor_return_requests')
+        
+        context = {
+            'return': return_req,
+            'order_item': return_req.order_item,
+            'product': return_req.order_item.product,
+            'customer': return_req.customer,
+            'page_title': 'Complete Pickup & Assessment'
+        }
+        return render(request, 'Vendor/complete_pickup.html', context)
+    except tbl_return_request.DoesNotExist:
+        messages.error(request, "Return request not found")
+        return redirect('vendor_return_requests')
+    except Exception as e:
+        messages.error(request, f"Error: {str(e)}")
+        return redirect('vendor_return_requests')
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from GuestApp.models import tbl_login, tbl_vendor
+from AdminApp.models import tbl_district, tbl_location, tbl_categorys, tbl_subcategory
+from VendorApp.models import tbl_product, tbl_furniture_details, tbl_appliance_details, tbl_product_image
+from CustomerApp.models import tbl_order, tbl_order_item, tbl_return_request
+from decimal import Decimal
+from datetime import datetime
+
+# Create your views here.
+def vendor_home(request):
+    return render(request, 'vendor/index.html')
+
+def my_profile(request):
+    """Vendor Profile View"""
+    try:
+        # Get vendor ID from session
+        vendor_login_id = request.session.get('vendor')
+        if not vendor_login_id:
+            return redirect('login')
+            
+        vendor = tbl_vendor.objects.get(login_id=vendor_login_id)
+        
+        context = {
+            'vendor': vendor
+        }
+        return render(request, 'vendor/my_profile.html', context)
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+
+
+
+# ======================== PRODUCT MANAGEMENT ========================
+
+def add_product(request):
+    """Add new product for rent"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+    if request.method == 'POST':
+        # Basic Product Fields
+        category_id = request.POST.get('category')
+        subcategory_id = request.POST.get('subcategory')
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        brand = request.POST.get('brand')
+        rent_price_per_day = request.POST.get('rent_price_per_day')
+        rent_price_per_month = request.POST.get('rent_price_per_month')
+        security_deposit = request.POST.get('security_deposit')
+        stock_quantity = request.POST.get('stock_quantity')
+        product_image = request.FILES.get('product_image')
+        
+        # Furniture Details
+        furniture_type = request.POST.get('furniture_type')
+        furniture_size = request.POST.get('furniture_size')
+        furniture_thickness = request.POST.get('furniture_thickness')
+        furniture_material = request.POST.get('furniture_material')
+        furniture_features = request.POST.get('furniture_features')
+        
+        # Appliance Details
+        appliance_type = request.POST.get('appliance_type')
+        appliance_power_rating = request.POST.get('appliance_power_rating')
+        appliance_voltage = request.POST.get('appliance_voltage')
+        appliance_warranty = request.POST.get('appliance_warranty')
+
+        # Validation
+        errors = []
+        if not category_id:
+            errors.append("Category is required")
+        if not subcategory_id:
+            errors.append("Subcategory is required")
+        if not product_name or len(product_name.strip()) == 0:
+            errors.append("Product name is required")
+        if not product_description or len(product_description.strip()) == 0:
+            errors.append("Description is required")
+        if not product_image:
+            errors.append("Product image is required")
+        
+        # At least one pricing option
+        if not rent_price_per_day and not rent_price_per_month:
+            errors.append("Enter at least one rental price (daily or monthly)")
+
+        # Validate prices
+        try:
+            if rent_price_per_day:
+                rent_price_per_day = float(rent_price_per_day)
+                if rent_price_per_day < 0:
+                    errors.append("Daily price cannot be negative")
+        except ValueError:
+            errors.append("Daily price must be a valid number")
+
+        try:
+            if rent_price_per_month:
+                rent_price_per_month = float(rent_price_per_month)
+                if rent_price_per_month < 0:
+                    errors.append("Monthly price cannot be negative")
+        except ValueError:
+            errors.append("Monthly price must be a valid number")
+
+        # Validate security deposit
+        try:
+            if security_deposit:
+                security_deposit = float(security_deposit)
+                if security_deposit < 0:
+                    errors.append("Security deposit cannot be negative")
+            else:
+                security_deposit = 0
+        except ValueError:
+            errors.append("Security deposit must be a valid number")
+
+        # Validate quantity
+        try:
+            stock_quantity = int(stock_quantity) if stock_quantity else 1
+            if stock_quantity <= 0:
+                errors.append("Quantity must be at least 1")
+        except ValueError:
+            errors.append("Quantity must be a valid number")
+
+        # Validate image
+        if product_image:
+            allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+            if product_image.content_type not in allowed_types:
+                errors.append("Product image must be JPEG, PNG, or WebP")
+
+        # Validate category-specific details
+        try:
+            category = tbl_categorys.objects.get(category_id=category_id)
+            # Check if furniture details are required (for Furniture category)
+            if category.category_name.lower() == 'furniture':
+                if not furniture_type:
+                    errors.append("Furniture type is required")
+                if not furniture_size:
+                    errors.append("Furniture size is required")
+                if not furniture_material:
+                    errors.append("Furniture material is required")
+            
+            # Check if appliance details are required (for Appliances category)
+            elif category.category_name.lower() == 'appliances':
+                if not appliance_type:
+                    errors.append("Appliance type is required")
+                if not appliance_power_rating:
+                    errors.append("Power rating is required")
+                if not appliance_voltage:
+                    errors.append("Voltage is required")
+        except tbl_categorys.DoesNotExist:
+            errors.append("Selected category not found")
+
+        if errors:
+            categories = tbl_categorys.objects.all()
+            for error in errors:
+                messages.error(request, error)
+            return render(request, 'Vendor/add_product.html', {
+                'categories': categories,
+                'form_data': request.POST
+            })
+
+        try:
+            category = tbl_categorys.objects.get(category_id=category_id)
+            subcategory = tbl_subcategory.objects.get(subcategory_id=subcategory_id)
+
+            # Verify subcategory belongs to selected category
+            if subcategory.category_id != int(category_id):
+                messages.error(request, "Invalid subcategory selection")
+                return redirect('add_product')
+
+            # Create product
+            product = tbl_product.objects.create(
+                vendor=vendor,
+                category=category,
+                subcategory=subcategory,
+                product_name=product_name.strip(),
+                product_description=product_description.strip(),
+                brand=brand.strip() if brand else None,
+                rent_price_per_day=rent_price_per_day if rent_price_per_day else None,
+                rent_price_per_month=rent_price_per_month if rent_price_per_month else None,
+                security_deposit=security_deposit,
+                stock_quantity=stock_quantity,
+                product_image=product_image,
+                is_available=True,
+                status='Active'
+            )
+
+            # Create furniture details if category is Furniture
+            if category.category_name.lower() == 'furniture':
+                tbl_furniture_details.objects.create(
+                    product=product,
+                    furniture_type=furniture_type.strip(),
+                    size=furniture_size.strip(),
+                    thickness=furniture_thickness.strip() if furniture_thickness else '',
+                    material=furniture_material.strip(),
+                    extra_features=furniture_features.strip() if furniture_features else None
+                )
+
+            # Create appliance details if category is Appliances
+            elif category.category_name.lower() == 'appliances':
+                tbl_appliance_details.objects.create(
+                    product=product,
+                    operation_type=appliance_type.strip(),
+                    power_rating=appliance_power_rating.strip(),
+                    voltage=appliance_voltage.strip(),
+                    warranty_period=appliance_warranty.strip() if appliance_warranty else ''
+                )
+
+            # Handle additional product images if provided
+            additional_images = request.FILES.getlist('additional_images')
+            for image in additional_images:
+                if image:
+                    tbl_product_image.objects.create(
+                        product=product,
+                        image=image
+                    )
+
+            messages.success(request, f"âS&  Product '{product_name}' added successfully!")
+            return redirect('vendor_products')
+
+        except tbl_categorys.DoesNotExist:
+            messages.error(request, "Selected category not found")
+            return redirect('add_product')
+        except tbl_subcategory.DoesNotExist:
+            messages.error(request, "Selected subcategory not found")
+            return redirect('add_product')
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Error adding product: {error_details}")  # Print to console for debugging
+            messages.error(request, f"Error adding product: {str(e)}")
+            return redirect('add_product')
+
+    categories = tbl_categorys.objects.all()
+    return render(request, 'Vendor/add_product.html', {
+        'categories': categories
+    })
+
+
+def vendor_products(request):
+    """Display vendor's products"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        products = tbl_product.objects.filter(vendor=vendor)
+        return render(request, 'Vendor/products.html', {
+            'products': products,
+            'vendor': vendor
+        })
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+
+def edit_product(request, product_id):
+    """Edit an existing product"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        product = tbl_product.objects.get(product_id=product_id, vendor=vendor)
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+    except tbl_product.DoesNotExist:
+        messages.error(request, "Product not found or you don't have permission to edit it")
+        return redirect('vendor_products')
+
+    if request.method == 'POST':
+        # Get form data
+        product_name = request.POST.get('product_name')
+        product_description = request.POST.get('product_description')
+        brand = request.POST.get('brand')
+        rent_price_per_day = request.POST.get('rent_price_per_day')
+        rent_price_per_month = request.POST.get('rent_price_per_month')
+        security_deposit = request.POST.get('security_deposit')
+        stock_quantity = request.POST.get('stock_quantity')
+        product_image = request.FILES.get('product_image')
+        is_available = request.POST.get('is_available') == 'on'
+        
+        # Furniture Details
+        furniture_type = request.POST.get('furniture_type')
+        furniture_size = request.POST.get('furniture_size')
+        furniture_thickness = request.POST.get('furniture_thickness')
+        furniture_material = request.POST.get('furniture_material')
+        furniture_features = request.POST.get('furniture_features')
+        
+        # Appliance Details
+        appliance_type = request.POST.get('appliance_type')
+        appliance_power_rating = request.POST.get('appliance_power_rating')
+        appliance_voltage = request.POST.get('appliance_voltage')
+        appliance_warranty = request.POST.get('appliance_warranty')
+
+        # Validation
+        errors = []
+        if not product_name or len(product_name.strip()) == 0:
+            errors.append("Product name is required")
+        if not product_description or len(product_description.strip()) == 0:
+            errors.append("Description is required")
+        
+        # At least one pricing option
+        if not rent_price_per_day and not rent_price_per_month:
+            errors.append("Enter at least one rental price (daily or monthly)")
+
+        # Validate prices
+        try:
+            if rent_price_per_day:
+                rent_price_per_day = float(rent_price_per_day)
+                if rent_price_per_day < 0:
+                    errors.append("Daily price cannot be negative")
+        except ValueError:
+            errors.append("Daily price must be a valid number")
+
+        try:
+            if rent_price_per_month:
+                rent_price_per_month = float(rent_price_per_month)
+                if rent_price_per_month < 0:
+                    errors.append("Monthly price cannot be negative")
+        except ValueError:
+            errors.append("Monthly price must be a valid number")
+
+        # Validate security deposit
+        try:
+            if security_deposit:
+                security_deposit = float(security_deposit)
+                if security_deposit < 0:
+                    errors.append("Security deposit cannot be negative")
+            else:
+                security_deposit = 0
+        except ValueError:
+            errors.append("Security deposit must be a valid number")
+
+        # Validate quantity
+        try:
+            stock_quantity = int(stock_quantity) if stock_quantity else 1
+            if stock_quantity <= 0:
+                errors.append("Quantity must be at least 1")
+        except ValueError:
+            errors.append("Quantity must be a valid number")
+
+        # Validate image
+        if product_image:
+            allowed_types = ['image/jpeg', 'image/png', 'image/webp']
+            if product_image.content_type not in allowed_types:
+                errors.append("Product image must be JPEG, PNG, or WebP")
+
+        if errors:
+            categories = tbl_categorys.objects.all()
+            for error in errors:
+                messages.error(request, error)
+            return render(request, 'Vendor/edit_product.html', {
+                'product': product,
+                'categories': categories,
+                'form_data': request.POST
+            })
+
+        try:
+            # Update product
+            product.product_name = product_name.strip()
+            product.product_description = product_description.strip()
+            product.brand = brand.strip() if brand else None
+            product.rent_price_per_day = rent_price_per_day if rent_price_per_day else None
+            product.rent_price_per_month = rent_price_per_month if rent_price_per_month else None
+            product.security_deposit = security_deposit
+            product.stock_quantity = stock_quantity
+            product.is_available = is_available
+            
+            if product_image:
+                product.product_image = product_image
+            
+            product.save()
+
+            # Update category-specific details
+            category = product.category
+            if category.category_name.lower() == 'furniture':
+                furniture_details, created = tbl_furniture_details.objects.get_or_create(product=product)
+                furniture_details.furniture_type = furniture_type.strip()
+                furniture_details.size = furniture_size.strip()
+                furniture_details.thickness = furniture_thickness.strip() if furniture_thickness else ''
+                furniture_details.material = furniture_material.strip()
+                furniture_details.extra_features = furniture_features.strip() if furniture_features else None
+                furniture_details.save()
+            
+            elif category.category_name.lower() == 'appliances':
+                appliance_details, created = tbl_appliance_details.objects.get_or_create(product=product)
+                appliance_details.operation_type = appliance_type.strip()
+                appliance_details.power_rating = appliance_power_rating.strip()
+                appliance_details.voltage = appliance_voltage.strip()
+                appliance_details.warranty_period = appliance_warranty.strip() if appliance_warranty else ''
+                appliance_details.save()
+
+            messages.success(request, f"âS&  Product '{product_name}' updated successfully!")
+            return redirect('vendor_products')
+
+        except Exception as e:
+            import traceback
+            error_details = traceback.format_exc()
+            print(f"Error updating product: {error_details}")
+            messages.error(request, f"Error updating product: {str(e)}")
+            return redirect('edit_product', product_id=product_id)
+
+    categories = tbl_categorys.objects.all()
+    
+    # Get category-specific details
+    furniture_details = None
+    appliance_details = None
+    
+    if hasattr(product, 'furniture_details'):
+        furniture_details = product.furniture_details
+    if hasattr(product, 'appliance_details'):
+        appliance_details = product.appliance_details
+    
+    return render(request, 'Vendor/edit_product.html', {
+        'product': product,
+        'categories': categories,
+        'furniture_details': furniture_details,
+        'appliance_details': appliance_details
+    })
+
+
+def delete_product(request, product_id):
+    """Delete a product"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        product = tbl_product.objects.get(product_id=product_id, vendor=vendor)
+        
+        product_name = product.product_name
+        product.delete()
+        
+        messages.success(request, f"âS&  Product '{product_name}' deleted successfully!")
+        return redirect('vendor_products')
+        
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+    except tbl_product.DoesNotExist:
+        messages.error(request, "Product not found or you don't have permission to delete it")
+        return redirect('vendor_products')
+    except Exception as e:
+        messages.error(request, f"Error deleting product: {str(e)}")
+        return redirect('vendor_products')
+
+
+def get_subcategories(request):
+    """AJAX endpoint to get subcategories by category"""
+    category_id = request.GET.get('category_id')
+    
+    if not category_id:
+        return JsonResponse({'subcategories': []})
+    
+    try:
+        subcategories = tbl_subcategory.objects.filter(
+            category_id=category_id
+        ).values('subcategory_id', 'subcategory_name')
+        return JsonResponse({
+            'subcategories': list(subcategories)
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=400)
+
+
+# ======================== ORDER MANAGEMENT ========================
+
+def vendor_orders(request):
+    """Display orders for vendor's products"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to view orders")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        
+        # Get all orders containing products from this vendor
+        vendor_orders = tbl_order.objects.filter(
+            items__product__vendor=vendor
+        ).distinct().order_by('-created_at')
+        
+        # Get filter options
+        status_filter = request.GET.get('status')
+        if status_filter:
+            vendor_orders = vendor_orders.filter(status=status_filter)
+        
+        context = {
+            'vendor': vendor,
+            'orders': vendor_orders,
+            'status_choices': tbl_order.ORDER_STATUS_CHOICES,
+        }
+        
+        return render(request, 'vendor/vendor_orders.html', context)
+    
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor account not found")
+        return redirect('vendor_home')
+
+
+def order_details(request, order_id):
+    """Display order details with vendor's products only"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to view order details")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        order = tbl_order.objects.get(order_id=order_id)
+        
+        # Get only items from this vendor
+        vendor_items = order.items.filter(product__vendor=vendor)
+        
+        # Check if this vendor has any items in this order
+        if not vendor_items.exists():
+            messages.error(request, "You don't have access to this order")
+            return redirect('vendor_orders')
+        
+        context = {
+            'order': order,
+            'vendor_items': vendor_items,
+            'vendor': vendor,
+        }
+        
+        return render(request, 'vendor/order_details.html', context)
+    
+    except (tbl_vendor.DoesNotExist, tbl_order.DoesNotExist):
+        messages.error(request, "Order not found")
+        return redirect('vendor_orders')
+
+
+@require_http_methods(["POST"])
+def accept_order(request, order_id):
+    """Accept an order - mark as confirmed"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to accept orders")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        order = tbl_order.objects.get(order_id=order_id)
+        
+        # Check if vendor has items in this order
+        vendor_items = order.items.filter(product__vendor=vendor)
+        if not vendor_items.exists():
+            messages.error(request, "You don't have access to this order")
+            return redirect('vendor_orders')
+        
+        # Only allow accepting pending orders
+        if order.status != 'pending':
+            messages.warning(request, "Only pending orders can be accepted")
+            return redirect('order_details', order_id=order_id)
+        
+        # Update order status
+        order.status = 'confirmed'
+        order.save()
+        
+        messages.success(request, f"Order {order.order_number} accepted successfully!")
+        
+    except (tbl_vendor.DoesNotExist, tbl_order.DoesNotExist):
+        messages.error(request, "Order not found")
+    except Exception as e:
+        messages.error(request, f"Error accepting order: {str(e)}")
+    
+    return redirect('order_details', order_id=order_id)
+
+
+@require_http_methods(["POST"])
+def reject_order(request, order_id):
+    """Reject an order - mark as cancelled"""
+    if 'vendor' not in request.session:
+        messages.warning(request, "Please login to reject orders")
+        return redirect('login')
+    
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session['vendor'])
+        order = tbl_order.objects.get(order_id=order_id)
+        
+        # Check if vendor has items in this order
+        vendor_items = order.items.filter(product__vendor=vendor)
+        if not vendor_items.exists():
+            messages.error(request, "You don't have access to this order")
+            return redirect('vendor_orders')
+        
+        # Only allow rejecting pending orders
+        if order.status != 'pending':
+            messages.warning(request, "Only pending orders can be rejected")
+            return redirect('order_details', order_id=order_id)
+        
+        # Update order status
+        order.status = 'cancelled'
+        order.save()
+        
+        messages.success(request, f"Order {order.order_number} rejected successfully!")
+        
+    except (tbl_vendor.DoesNotExist, tbl_order.DoesNotExist):
+        messages.error(request, "Order not found")
+    except Exception as e:
+        messages.error(request, f"Error rejecting order: {str(e)}")
+    
+    return redirect('vendor_orders')
+
+# ======================== RETURN & PICKUP MANAGEMENT ========================
+
+def vendor_return_requests(request):
+    """Vendor views all return requests for their products"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+    except tbl_vendor.DoesNotExist:
+        messages.error(request, "Vendor not found")
+        return redirect('vendor_home')
+    
+    try:
+        # Get return requests for this vendor's products
+        return_requests = tbl_return_request.objects.filter(
+            order_item__product__vendor=vendor
+        ).select_related('customer', 'order_item__product', 'order').order_by('-request_date')
+        
+        # Separate by status
+        pending = return_requests.filter(status='requested')
+        scheduled = return_requests.filter(status='scheduled')
+        picked_up = return_requests.filter(status='picked_up')
+        completed = return_requests.filter(status='completed')
+        
+        context = {
+            'all_returns': return_requests,
+            'pending': pending,
+            'scheduled': scheduled,
+            'picked_up': picked_up,
+            'completed': completed,
+            'page_title': 'Return & Pickup Requests'
+        }
+        return render(request, 'Vendor/return_requests.html', context)
+    except Exception as e:
+        import traceback
+        print(f"Error loading returns: {str(e)}")
+        print(traceback.format_exc())
+        messages.error(request, f"Error loading returns: {str(e)}")
+        # return redirect('vendor_home')
+        raise e
+
+
+def schedule_pickup(request, return_id):
+    """Vendor schedules pickup for a return request"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        return_req = tbl_return_request.objects.get(return_id=return_id)
+        
+        # Verify this return is for vendor's product
+        if return_req.order_item.product.vendor != vendor:
+            return JsonResponse({'success': False, 'message': 'Unauthorized'}, status=403)
+        
+        if request.method == 'POST':
+            pickup_date = request.POST.get('pickup_scheduled_date')
+            
+            if not pickup_date:
+                return JsonResponse({'success': False, 'message': 'Please select a date'})
+            
+            # Update return request
+            return_req.pickup_scheduled_date = pickup_date
+            return_req.status = 'scheduled'
+            return_req.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': f'Pickup scheduled for {pickup_date}'
+            })
+    except tbl_return_request.DoesNotExist:
+        return JsonResponse({'success': False, 'message': 'Return request not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)}, status=500)
+    
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+
+def complete_pickup(request, return_id):
+    """Vendor completes pickup and assesses defects"""
+    try:
+        vendor = tbl_vendor.objects.get(login_id=request.session.get('vendor'))
+        return_req = tbl_return_request.objects.get(return_id=return_id)
+        
+        # Verify authorization
+        if return_req.order_item.product.vendor != vendor:
+            messages.error(request, "Unauthorized")
+            return redirect('vendor_home')
+        
+        if request.method == 'POST':
+            # Defect assessment
+            defect_status = request.POST.get('defect_status', 'no_defect')
+            defect_description = request.POST.get('defect_description', '')
+            defect_image = request.FILES.get('defect_image')
+            actual_return_date = request.POST.get('actual_return_date')
+            
+            # Update return request
+            return_req.defect_status = defect_status
+            return_req.defect_description = defect_description if defect_description else None
+            if defect_image:
+                return_req.defect_image = defect_image
+            
+            # Set actual return date
+            if actual_return_date:
+                return_req.actual_return_date = actual_return_date
+            
+            # Calculate deductions
+            return_req.calculate_deductions(extra_day_percentage=5)
+            
+            # Mark as picked up
+            return_req.pickup_completed_date = datetime.now()
+            return_req.status = 'completed'
+            return_req.save()
+            
+            messages.success(request, f"Return {return_id} completed. Refund: â ¹{return_req.refund_amount}")
+            return redirect('vendor_return_requests')
+        
+        context = {
+            'return': return_req,
+            'order_item': return_req.order_item,
+            'product': return_req.order_item.product,
+            'customer': return_req.customer,
+            'page_title': 'Complete Pickup & Assessment'
+        }
+        return render(request, 'Vendor/complete_pickup.html', context)
+    except tbl_return_request.DoesNotExist:
+        messages.error(request, "Return request not found")
+        return redirect('vendor_return_requests')
+    except Exception as e:
+        messages.error(request, f"Error: {str(e)}")
+        return redirect('vendor_return_requests')

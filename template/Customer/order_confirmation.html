@@ -1,0 +1,177 @@
+{% extends 'customer/base.html' %}
+{% load static %}
+
+{% block title %}Order Confirmation - Urban Rentals{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Banner -->
+            <div class="alert alert-success border-0 rounded-3 shadow-sm mb-4" role="alert">
+                <div class="text-center">
+                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mb-3">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h2 class="mb-2">Order Placed Successfully!</h2>
+                    <p class="text-muted mb-0">Your order has been placed and is pending vendor confirmation.</p>
+                </div>
+            </div>
+
+            <!-- Order Details Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-light border-bottom rounded-top-3">
+                    <h5 class="mb-0">Order Details</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Order Number</label>
+                            <p class="h6 mb-0"><strong>{{ order.order_number }}</strong></p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Order Date</label>
+                            <p class="h6 mb-0"><strong>{{ order.created_at|date:"M d, Y H:i" }}</strong></p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label class="text-muted small">Order Status</label>
+                            <p>
+                                <span class="badge bg-warning text-dark">
+                                    {{ order.get_status_display }}
+                                </span>
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-muted small">Total Amount</label>
+                            <p class="h6 mb-0"><strong>₹{{ order.grand_total }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Address Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-light border-bottom rounded-top-3">
+                    <h5 class="mb-0">Delivery Address</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-1"><strong>{{ order.delivery_address.full_name }}</strong></p>
+                    <p class="mb-1">{{ order.delivery_address.phone_number }}</p>
+                    <p class="mb-1">{{ order.delivery_address.address_line_1 }}</p>
+                    {% if order.delivery_address.address_line_2 %}
+                        <p class="mb-1">{{ order.delivery_address.address_line_2 }}</p>
+                    {% endif %}
+                    <p class="mb-1">{{ order.delivery_address.city }}, {{ order.delivery_address.state }} {{ order.delivery_address.pincode }}</p>
+                    {% if order.delivery_address.landmark %}
+                        <p class="mb-0 text-muted"><small>Landmark: {{ order.delivery_address.landmark }}</small></p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Order Items Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-light border-bottom rounded-top-3">
+                    <h5 class="mb-0">Order Items</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Product</th>
+                                    <th>Rental Type</th>
+                                    <th>Duration</th>
+                                    <th>Qty</th>
+                                    <th>Rent</th>
+                                    <th>Deposit</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in order_items %}
+                                <tr>
+                                    <td>
+                                        {% if item.product %}
+                                            <strong>{{ item.product.product_name }}</strong>
+                                        {% else %}
+                                            <span class="text-muted">(Product removed)</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ item.get_rent_type_display }}</td>
+                                    <td>{{ item.rental_duration }} {% if item.rent_type == 'daily' %}days{% else %}months{% endif %}</td>
+                                    <td>{{ item.quantity }}</td>
+                                    <td>₹{{ item.rent_price }}</td>
+                                    <td>₹{{ item.security_deposit }}</td>
+                                    <td><strong>₹{{ item.grand_total }}</strong></td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-3">No items in this order</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price Summary Card -->
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-body p-4">
+                    <div class="row mb-2">
+                        <div class="col-6">
+                            <p class="mb-0">Total Rent:</p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <p class="mb-0">₹{{ order.total_rent }}</p>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <p class="mb-0">Security Deposit:</p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <p class="mb-0">₹{{ order.total_security_deposit }}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-6">
+                            <h6 class="mb-0"><strong>Grand Total:</strong></h6>
+                        </div>
+                        <div class="col-6 text-end">
+                            <h6 class="mb-0"><strong>₹{{ order.grand_total }}</strong></h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 gap-sm-3 d-sm-flex justify-content-center mb-4">
+                <a href="{% url 'my_orders' %}" class="btn btn-primary btn-lg rounded-3">
+                    <i class="bi bi-box-seam"></i> View My Orders
+                </a>
+                <a href="{% url 'browse_products' %}" class="btn btn-outline-primary btn-lg rounded-3">
+                    Continue Shopping
+                </a>
+            </div>
+
+            <!-- Info Box -->
+            <div class="alert alert-info border-0 rounded-3">
+                <h6 class="mb-2">What happens next?</h6>
+                <ul class="mb-0">
+                    <li>The vendor will review your order and confirm availability</li>
+                    <li>Once confirmed, you'll receive a notification to proceed with payment</li>
+                    <li>After payment, your order will be ready for pickup or delivery</li>
+                    <li>You can track your order status anytime from your dashboard</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

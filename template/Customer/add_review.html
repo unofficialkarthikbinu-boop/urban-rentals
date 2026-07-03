@@ -1,0 +1,218 @@
+{% extends 'customer/base.html' %}
+{% load static %}
+
+{% block title %}Write a Review - Urban Rentals{% endblock %}
+
+{% block content %}
+<style>
+    .review-container {
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    
+    .star-rating {
+        display: flex;
+        gap: 10px;
+        font-size: 2rem;
+    }
+    
+    .star {
+        cursor: pointer;
+        color: #ddd;
+        transition: all 0.2s;
+    }
+    
+    .star:hover,
+    .star.active {
+        color: #ffc107;
+    }
+</style>
+
+<div class="container py-5">
+    <div class="review-container">
+        <!-- Header -->
+        <div class="mb-4">
+            <a href="{% url 'product_detail' product.product_id %}" class="btn btn-outline-secondary btn-sm mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Product
+            </a>
+            <h2 class="mb-2">Write a Review</h2>
+            <p class="text-muted">Share your experience with this product</p>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Product Info Card -->
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-body p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-3 text-center">
+                        {% if product.product_image %}
+                            <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" 
+                                 class="img-fluid rounded" style="max-height: 150px;">
+                        {% else %}
+                            <div class="bg-light rounded p-4">
+                                <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-9">
+                        <h5 class="mb-1">{{ product.product_name }}</h5>
+                        <p class="text-muted small mb-2">{{ product.product_description|truncatewords:20 }}</p>
+                        <p class="mb-0">
+                            <span class="badge bg-primary">{{ product.category.category_name }}</span>
+                            <span class="badge bg-secondary">{{ product.subcategory.subcategory_name }}</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Form -->
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-4">
+                <form method="POST" id="reviewForm">
+                    {% csrf_token %}
+
+                    <!-- Rating -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Rating <span class="text-danger">*</span></label>
+                        <div class="star-rating" id="ratingStars">
+                            <i class="bi bi-star star" data-rating="1"></i>
+                            <i class="bi bi-star star" data-rating="2"></i>
+                            <i class="bi bi-star star" data-rating="3"></i>
+                            <i class="bi bi-star star" data-rating="4"></i>
+                            <i class="bi bi-star star" data-rating="5"></i>
+                        </div>
+                        <input type="hidden" name="rating" id="ratingInput" value="{% if existing_review %}{{ existing_review.rating }}{% else %}5{% endif %}">
+                        <small class="text-muted d-block mt-2">
+                            <span id="ratingText">
+                                {% if existing_review %}
+                                    {% if existing_review.rating == 1 %}1 - Poor
+                                    {% elif existing_review.rating == 2 %}2 - Fair
+                                    {% elif existing_review.rating == 3 %}3 - Good
+                                    {% elif existing_review.rating == 4 %}4 - Very Good
+                                    {% else %}5 - Excellent{% endif %}
+                                {% else %}5 - Excellent{% endif %}
+                            </span>
+                        </small>
+                    </div>
+
+                    <!-- Title -->
+                    <div class="mb-4">
+                        <label for="title" class="form-label fw-bold">Review Title <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control form-control-lg rounded-3" id="title" name="title" 
+                               required placeholder="Brief title for your review (min 5 characters)"
+                               value="{% if existing_review %}{{ existing_review.title }}{% endif %}"
+                               minlength="5" maxlength="200">
+                        <small class="text-muted">Minimum 5 characters</small>
+                    </div>
+
+                    <!-- Comment -->
+                    <div class="mb-4">
+                        <label for="comment" class="form-label fw-bold">Your Review <span class="text-danger">*</span></label>
+                        <textarea class="form-control rounded-3" id="comment" name="comment" required 
+                                  placeholder="Share your detailed experience with this product (min 10 characters)"
+                                  rows="6" minlength="10">{% if existing_review %}{{ existing_review.comment }}{% endif %}</textarea>
+                        <small class="text-muted">Minimum 10 characters. Be honest and helpful!</small>
+                    </div>
+
+                    <!-- Verified Purchase Badge -->
+                    {% if existing_review.is_verified_purchase %}
+                        <div class="alert alert-success mb-4">
+                            <i class="bi bi-check-circle-fill me-2"></i> Verified Purchase
+                        </div>
+                    {% endif %}
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 d-sm-flex justify-content-between">
+                        <a href="{% url 'my_orders' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg rounded-3">
+                            <i class="bi bi-check-lg"></i> {% if existing_review %}Update Review{% else %}Submit Review{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="alert alert-info rounded-3 mt-4">
+            <h6 class="alert-heading"><i class="bi bi-info-circle"></i> Review Guidelines</h6>
+            <ul class="mb-0 small">
+                <li>Be honest and fair in your review</li>
+                <li>Share specific details about the product</li>
+                <li>Avoid profanity and personal attacks</li>
+                <li>Focus on the product quality and your experience</li>
+                <li>Reviews are public and visible to other customers</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Star rating functionality
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('ratingInput');
+    const ratingText = document.getElementById('ratingText');
+    
+    const ratingLabels = {
+        1: '1 - Poor',
+        2: '2 - Fair',
+        3: '3 - Good',
+        4: '4 - Very Good',
+        5: '5 - Excellent'
+    };
+    
+    function updateStars(rating) {
+        stars.forEach(star => {
+            if (parseInt(star.dataset.rating) <= rating) {
+                star.classList.add('active');
+                star.classList.remove('bi-star');
+                star.classList.add('bi-star-fill');
+            } else {
+                star.classList.remove('active');
+                star.classList.remove('bi-star-fill');
+                star.classList.add('bi-star');
+            }
+        });
+        ratingInput.value = rating;
+        ratingText.textContent = ratingLabels[rating];
+    }
+    
+    stars.forEach(star => {
+        star.addEventListener('click', function() {
+            const rating = parseInt(this.dataset.rating);
+            updateStars(rating);
+        });
+        
+        star.addEventListener('mouseenter', function() {
+            const rating = parseInt(this.dataset.rating);
+            stars.forEach(s => {
+                if (parseInt(s.dataset.rating) <= rating) {
+                    s.style.color = '#ffc107';
+                } else {
+                    s.style.color = '#ddd';
+                }
+            });
+        });
+    });
+    
+    document.getElementById('ratingStars').addEventListener('mouseleave', function() {
+        const currentRating = parseInt(ratingInput.value);
+        updateStars(currentRating);
+    });
+    
+    // Initialize with current rating
+    const initialRating = parseInt(ratingInput.value);
+    updateStars(initialRating);
+</script>
+{% endblock %}

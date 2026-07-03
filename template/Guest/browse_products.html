@@ -1,0 +1,365 @@
+{% load static %}
+{% include "Guest/header.html" %}
+
+<main class="pt-5">
+  <div class="container py-5">
+    <!-- Page Header -->
+    <div class="row mb-5">
+      <div class="col-md-8">
+        <h1 class="display-5 fw-bold mb-2">Browse Products</h1>
+        <p class="text-muted">Discover our wide range of furniture and appliances available for rent</p>
+      </div>
+      <div class="col-md-4 text-md-end">
+        <div class="results-count">
+          <p class="text-muted">Showing <strong>{{ products.count }}</strong> products</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Sidebar Filters -->
+      <div class="col-lg-3">
+        <div class="card shadow-sm border-0 rounded-4 sticky-top" style="top: 100px; z-index: 10;">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="fw-bold m-0 text-dark">Filter By</h5>
+                {% if selected_category or selected_subcategory or search_query %}
+                    <a href="{% url 'guest_browse_products' %}" class="text-danger small text-decoration-none fw-semibold">
+                        <i class="bi bi-x-circle me-1"></i>Reset
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Search -->
+            <div class="mb-4">
+                <form method="GET" class="position-relative">
+                    <input 
+                        type="text" 
+                        name="search" 
+                        placeholder="Search products..." 
+                        class="form-control bg-light border-0 rounded-3 ps-4 py-2"
+                        value="{{ search_query|default:'' }}"
+                        style="box-shadow: none;"
+                    >
+                    <button type="submit" class="btn btn-link position-absolute top-50 end-0 translate-middle-y text-muted p-0 pe-3 text-decoration-none">
+                        <i class="bi bi-search"></i>
+                    </button>
+                    <!-- Carry over existing filters if searching -->
+                    {% if selected_category %}
+                        <input type="hidden" name="category" value="{{ selected_category }}">
+                    {% endif %}
+                    {% if selected_subcategory %}
+                        <input type="hidden" name="subcategory" value="{{ selected_subcategory }}">
+                    {% endif %}
+                </form>
+            </div>
+
+            <hr class="text-muted opacity-25 my-4">
+
+            <!-- Category Filter -->
+            <div class="mb-4">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3 ls-1" style="letter-spacing: 1px;">Categories</h6>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'guest_browse_products' %}" class="list-group-item list-group-item-action border-0 px-0 py-2 {% if not selected_category %}fw-bold text-primary{% else %}text-secondary{% endif %} bg-transparent">
+                        <i class="bi bi-grid me-2"></i> All Categories
+                    </a>
+                    {% for category in categories %}
+                        <a href="?category={{ category.category_id }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                           class="list-group-item list-group-item-action border-0 px-0 py-2 d-flex justify-content-between align-items-center bg-transparent {% if selected_category|add:0 == category.category_id %}fw-bold text-primary{% else %}text-secondary{% endif %}">
+                            <span>
+                                <i class="bi bi-chevron-right me-2 small {% if selected_category|add:0 == category.category_id %}text-primary{% else %}text-muted{% endif %}" style="font-size: 0.75rem;"></i>
+                                {{ category.category_name }}
+                            </span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Subcategory Filter -->
+            {% if selected_category %}
+            <div class="mb-4">
+                <h6 class="text-uppercase text-muted small fw-bold mb-3 ls-1" style="letter-spacing: 1px;">Sub-Categories</h6>
+                <div class="d-flex flex-wrap gap-2">
+                     <a href="?category={{ selected_category }}" class="btn btn-sm {% if not selected_subcategory %}btn-primary{% else %}btn-outline-secondary border-0 bg-light{% endif %} rounded-pill px-3">
+                        All
+                    </a>
+                    {% for subcategory in subcategories %}
+                        <a href="?category={{ selected_category }}&subcategory={{ subcategory.subcategory_id }}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                           class="btn btn-sm {% if selected_subcategory|add:0 == subcategory.subcategory_id %}btn-primary{% else %}btn-outline-secondary border-0 bg-light{% endif %} rounded-pill px-3">
+                            {{ subcategory.subcategory_name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <hr class="text-muted opacity-25 my-4">
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="col-lg-9">
+        <!-- Sort Options -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div class="sort-options">
+            <label for="sort" class="me-2">Sort by:</label>
+            <select id="sort" class="form-select form-select-sm d-inline-block w-auto" onchange="updateSort(this.value)">
+              <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+              <option value="price_low" {% if sort_by == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+              <option value="price_high" {% if sort_by == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+              <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Popular</option>
+            </select>
+          </div>
+          <div class="view-options">
+            <button class="btn btn-sm btn-outline-secondary active" id="gridView" title="Grid View">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="7" height="7"/>
+                <rect x="14" y="3" width="7" height="7"/>
+                <rect x="3" y="14" width="7" height="7"/>
+                <rect x="14" y="14" width="7" height="7"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Products -->
+        {% if products %}
+          <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="productsContainer">
+            {% for product in products %}
+              <div class="col product-col">
+                <div class="product-item hover-effect-slide h-100 rounded-3 overflow-hidden">
+                  <div class="image-holder position-relative" style="background-color: #f8f9fa; display: flex; align-items: center; justify-content: center; height: 280px;">
+                    <!-- Product Image -->
+                    {% if product.product_image %}
+                      <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="product-image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    {% else %}
+                      <img src="https://via.placeholder.com/280x280?text=No+Image" alt="No image" class="product-image" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    {% endif %}
+
+                    <!-- Availability Badge -->
+                    {% if product.is_available and product.stock_quantity > 0 %}
+                      <span class="position-absolute top-0 start-0 m-2 badge bg-success" style="font-size: 0.75rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <use xlink:href="#check"></use>
+                        </svg>
+                        Available
+                      </span>
+                    {% else %}
+                      <span class="position-absolute top-0 start-0 m-2 badge bg-danger" style="font-size: 0.75rem;">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                          <use xlink:href="#x"></use>
+                        </svg>
+                        Out of Stock
+                      </span>
+                    {% endif %}
+
+                    <!-- Stock Badge -->
+                    {% if product.stock_quantity <= 3 %}
+                      <span class="position-absolute top-0 end-0 m-2 badge bg-warning text-dark" style="font-size: 0.75rem;">
+                        Limited Stock
+                      </span>
+                    {% endif %}
+
+                    <!-- Wishlist Button -->
+                    <a href="#" class="btn-icon btn-wishlist position-absolute bottom-3 end-3">
+                      <svg width="24" height="24" viewBox="0 0 24 24" class="text-white">
+                        <use xlink:href="#heart"></use>
+                      </svg>
+                    </a>
+                  </div>
+
+                  <div class="product-content p-3">
+                    <!-- Category -->
+                    <span class="small text-muted">{{ product.category.category_name }}</span>
+                    
+                    <!-- Product Name -->
+                    <h5 class="element-title text-uppercase fs-6 mt-2 mb-2">
+                      <a href="{% url 'login' %}" class="text-dark text-decoration-none">
+                        {{ product.product_name }}
+                      </a>
+                    </h5>
+
+                    <!-- Brand -->
+                    {% if product.brand %}
+                      <p class="small text-secondary mb-2">
+                        <strong>Brand:</strong> {{ product.brand }}
+                      </p>
+                    {% endif %}
+
+                    <!-- Pricing -->
+                    <div class="pricing-section mb-3 p-2 bg-light rounded-2">
+                      {% if product.rent_price_per_day %}
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                          <span class="small text-muted">Daily:</span>
+                          <strong class="text-primary">₹{{ product.rent_price_per_day }}</strong>
+                        </div>
+                      {% endif %}
+                      {% if product.rent_price_per_month %}
+                        <div class="d-flex justify-content-between align-items-center">
+                          <span class="small text-muted">Monthly:</span>
+                          <strong class="text-primary">₹{{ product.rent_price_per_month }}</strong>
+                        </div>
+                      {% endif %}
+                    </div>
+
+                    <!-- Security Deposit -->
+                    {% if product.security_deposit > 0 %}
+                      <p class="small text-danger mb-2">
+                        <strong>Deposit:</strong> ₹{{ product.security_deposit }}
+                      </p>
+                    {% endif %}
+
+                    <!-- Stock Info -->
+                    <p class="small mb-3">
+                      <strong>Stock:</strong> 
+                      <span class="badge {% if product.stock_quantity > 0 %}bg-success{% else %}bg-danger{% endif %}">
+                        {% if product.stock_quantity > 0 %}{{ product.stock_quantity }} Available{% else %}Out of Stock{% endif %}
+                      </span>
+                    </p>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex gap-2">
+                      {% if product.is_available and product.stock_quantity > 0 %}
+                        <a href="{% url 'login' %}" class="btn btn-primary w-100 rounded-3 py-2">
+                          <small>View Details</small>
+                        </a>
+                      {% else %}
+                        <button class="btn btn-secondary w-100 rounded-3 py-2" disabled>
+                          <small>Out of Stock</small>
+                        </button>
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- No Products Found -->
+          <div class="text-center py-5">
+            <div style="font-size: 64px; color: #ddd; margin-bottom: 20px;">
+              📦
+            </div>
+            <h3 class="text-muted mb-2">No Products Found</h3>
+            <p class="text-muted mb-4">
+              {% if search_query %}
+                No products match your search for "<strong>{{ search_query }}</strong>"
+              {% elif selected_category %}
+                No products available in the selected category
+              {% else %}
+                No products are currently available
+              {% endif %}
+            </p>
+            <a href="{% url 'guest_browse_products' %}" class="btn btn-outline-primary rounded-pill px-5">
+              Browse All Products
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+
+<style>
+  .filter-card {
+    background-color: #f8f9fa;
+    border-color: #dee2e6 !important;
+  }
+
+  .filter-link {
+    color: #6c757d;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    padding: 0.5rem 0;
+    border-left: 3px solid transparent;
+    padding-left: 0.75rem;
+  }
+
+  .filter-link:hover {
+    color: #0d6efd;
+    border-left-color: #0d6efd;
+  }
+
+  .product-item {
+    background: white;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .product-content .d-flex:last-of-type {
+    margin-top: auto;
+  }
+
+  .product-item:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    transform: translateY(-4px);
+  }
+  
+  .btn-icon.btn-wishlist {
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .btn-icon.btn-wishlist:hover {
+    background: #dc3545;
+    transform: scale(1.1);
+  }
+
+  .image-holder {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .product-image {
+    transition: transform 0.3s ease;
+  }
+
+  .product-item:hover .product-image {
+    transform: scale(1.05);
+  }
+
+  .product-item .btn {
+    transition: none !important;
+    transform: none !important;
+  }
+
+  @media (max-width: 992px) {
+    .filter-card {
+      position: static !important;
+    }
+  }
+</style>
+
+<script>
+  function updateSort(sortValue) {
+    const url = new URL(window.location);
+    url.searchParams.set('sort', sortValue);
+    window.location = url.toString();
+  }
+
+  // Add to cart functionality
+  function addToCart(productId) {
+    // Redirect to product detail for guest to add from there
+    window.location.href = `/guestapp/product/${productId}/`;
+  }
+</script>
+
+{% include "Guest/footer.html" %}

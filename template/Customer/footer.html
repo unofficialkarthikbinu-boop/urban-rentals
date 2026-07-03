@@ -1,0 +1,108 @@
+{% load static %}
+
+<footer id="footer" class="bg-black border-top" data-bs-theme="dark">
+    <div class="container-fluid">
+      <div class="row d-flex flex-wrap justify-content-between py-5">
+        <div class="col-md-3 col-sm-6">
+          <div class="footer-menu footer-menu-001">
+            <div class="footer-intro mb-4">
+              <a href="{% url 'customer_home' %}">
+                <h3 class="text-white m-0">Urban Rentals</h3>
+              </a>
+            </div>
+            <p>Your one-stop destination for premium furniture rentals. Quality, comfort, and style delivered to your doorstep.</p>
+            <div class="social-links">
+              <ul class="list-unstyled d-flex flex-wrap gap-3">
+                <li>
+                  <a href="#" class="text-secondary">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#facebook"></use></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="text-secondary">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#twitter"></use></svg>
+                  </a>
+                </li>
+                <li>
+                  <a href="#" class="text-secondary">
+                    <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#instagram"></use></svg>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="footer-menu footer-menu-002">
+            <h5 class="widget-title mb-4">Quick Links</h5>
+            <ul class="menu-list list-unstyled fs-6">
+              <li class="menu-item">
+                <a href="{% url 'customer_home' %}" class="item-anchor">Home</a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'browse_products' %}" class="item-anchor">Shop</a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'my_orders' %}" class="item-anchor">My Orders</a>
+              </li>
+              <li class="menu-item">
+                <a href="{% url 'customer_profile' %}" class="item-anchor">My Account</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="footer-menu footer-menu-003">
+            <h5 class="widget-title mb-4">Help & Info</h5>
+            <ul class="menu-list list-unstyled fs-6">
+              <li class="menu-item">
+                <a href="{% url 'my_orders' %}" class="item-anchor">Track Your Order</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="item-anchor">Returns Policy</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="item-anchor">Shipping Info</a>
+              </li>
+              <li class="menu-item">
+                <a href="#" class="item-anchor">FAQ</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6">
+          <div class="footer-menu footer-menu-004 border-animation-left">
+            <h5 class="widget-title mb-4">Contact Us</h5>
+            <p>Questions? Suggestions? <br> <a href="mailto:support@urbanrentals.com" class="item-anchor">urbanrentalsofficial@gmail.com</a></p>
+            <p>Need support? Call us. <br> <a href="tel:+1234567890" class="item-anchor">+91 8075290167</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="border-top py-4">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-6 d-flex flex-wrap">
+            <div class="payment-option">
+              <span>Secure Payment:</span>
+              <img src="{% static 'customer/images/visa-card.png' %}" alt="card">
+              <img src="{% static 'customer/images/paypal-card.png' %}" alt="card">
+              <img src="{% static 'customer/images/master-card.png' %}" alt="card">
+            </div>
+          </div>
+          <div class="col-md-6 text-start text-md-end">
+            <p>© 2024 Urban Rentals. All rights reserved.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="{% static 'customer/js/jquery.min.js' %}"></script>
+  <script src="{% static 'customer/js/plugins.js' %}"></script>
+  <script src="{% static 'customer/js/SmoothScroll.js' %}"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+  <script src="{% static 'customer/js/script.js' %}"></script>
+</body>
+</html>

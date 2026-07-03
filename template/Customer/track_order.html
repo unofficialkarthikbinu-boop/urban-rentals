@@ -1,0 +1,291 @@
+{% extends 'customer/base.html' %}
+{% load static %}
+
+{% block title %}Track Order #{{ order.order_number }} - Urban Rentals{% endblock %}
+
+{% block content %}
+<style>
+    .track-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .status-timeline {
+        position: relative;
+        padding: 20px 0;
+    }
+    
+    .timeline-item {
+        display: flex;
+        padding-bottom: 30px;
+        position: relative;
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 40px;
+        bottom: 0;
+        width: 2px;
+        background: #e9ecef;
+    }
+    
+    .timeline-item:last-child::before {
+        display: none;
+    }
+    
+    .timeline-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: #fff;
+        border: 2px solid #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 20px;
+        z-index: 1;
+        flex-shrink: 0;
+        color: #adb5bd;
+    }
+    
+    .timeline-item.active .timeline-icon {
+        border-color: #0d6efd;
+        color: #0d6efd;
+        background: #e7f1ff;
+    }
+    
+    .timeline-item.completed .timeline-icon {
+        border-color: #198754;
+        background: #198754;
+        color: #fff;
+    }
+    
+    .timeline-item.completed::before {
+        background: #198754;
+    }
+    
+    .timeline-content h5 {
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+    }
+    
+    .timeline-content p {
+        margin-bottom: 0;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+    
+    .order-summary-mini {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    /* Review styles removed */
+</style>
+
+<div class="container py-5">
+    <div class="row track-container">
+        <div class="col-12 mb-4">
+            <a href="{% url 'my_orders' %}" class="btn btn-outline-secondary btn-sm mb-3">
+                <i class="bi bi-arrow-left"></i> Back to Orders
+            </a>
+            <h2 class="mb-1">Track Order</h2>
+            <p class="text-muted">Order #{{ order.order_number }}</p>
+        </div>
+
+        <!-- Order Status Header -->
+        <div class="col-12 mb-4">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h5 class="mb-1">Estimated Delivery</h5>
+                            <p class="text-success mb-0 fw-bold">
+                                {% if order.status == 'completed' or order.status == 'delivered' %}
+                                    Delivered
+                                {% elif order.status == 'cancelled' %}
+                                    Cancelled
+                                {% else %}
+                                    Arriving Soon
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="text-end">
+                            <span class="badge 
+                                {% if order.status == 'pending' %}bg-warning text-dark
+                                {% elif order.status == 'confirmed' %}bg-info text-white
+                                {% elif order.status == 'paid' %}bg-primary text-white
+                                {% elif order.status == 'delivered' %}bg-success text-white
+                                {% elif order.status == 'completed' %}bg-success text-white
+                                {% else %}bg-danger text-white{% endif %} fs-6 px-3 py-2 rounded-pill">
+                                {{ order.get_status_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0">Delivery Status</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if order.status == 'cancelled' %}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-x-circle-fill me-2"></i> This order has been cancelled.
+                        </div>
+                    {% else %}
+                        <div class="status-timeline">
+                            <!-- Order Placed -->
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h5>Order Placed</h5>
+                                    <p>We have received your order.</p>
+                                    <small class="text-muted">{{ order.created_at|date:"M d, Y H:i A" }}</small>
+                                </div>
+                            </div>
+
+                            <!-- Vendor Confirmation -->
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-shop"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h5>Vendor Confirmation</h5>
+                                    <p>Vendor confirms product availability.</p>
+                                </div>
+                            </div>
+
+                            <!-- Payment -->
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-credit-card"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h5>Payment Processed</h5>
+                                    <p>Payment has been received.</p>
+                                </div>
+                            </div>
+
+                            <!-- Out for Delivery -->
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-truck"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h5>Out for Delivery</h5>
+                                    <p>Your order is on the way to your address.</p>
+                                </div>
+                            </div>
+
+                            <!-- Delivered -->
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-box-seam"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h5>Delivered</h5>
+                                    <p>Package has been delivered.</p>
+                                </div>
+                            </div>
+
+                            <!-- Return Completed (if applicable) -->
+                            {% if has_completed_return %}
+                            <div class="timeline-item completed">
+                                <div class="timeline-icon">
+                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h5>Return Completed</h5>
+                                    <p>Item has been returned and pickup completed.</p>
+                                    {% for return in completed_returns %}
+                                        <small class="text-muted">Completed: {{ return.pickup_completed_date|date:"M d, Y H:i A" }}</small>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Info Sidebar -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm rounded-3 mb-4">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0">Delivery Address</h5>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-1 fw-bold">{{ order.delivery_address.full_name }}</p>
+                    <p class="mb-1">{{ order.delivery_address.address_line_1 }}</p>
+                    {% if order.delivery_address.address_line_2 %}
+                        <p class="mb-1">{{ order.delivery_address.address_line_2 }}</p>
+                    {% endif %}
+                    <p class="mb-1">
+                        {{ order.delivery_address.city }}, {{ order.delivery_address.state }}
+                    </p>
+                    <p class="mb-2">{{ order.delivery_address.pincode }}</p>
+                    <p class="mb-0 text-muted"><i class="bi bi-telephone me-2"></i>{{ order.delivery_address.phone_number }}</p>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body p-4">
+                    {% for item in order.items.all %}
+                        <div class="d-flex mb-3">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ item.product.product_name }}</h6>
+                                <small class="text-muted">
+                                    Qty: {{ item.quantity }} | {{ item.rental_duration }} 
+                                    {% if item.rent_type == 'daily' %}days{% else %}months{% endif %}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <span class="fw-bold">₹{{ item.grand_total }}</span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>₹{{ order.total_rent }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Security Deposit</span>
+                        <span>₹{{ order.total_security_deposit }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-bold pt-2 border-top">
+                        <span>Total</span>
+                        <span class="text-success">₹{{ order.grand_total }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Review functionality removed
+});
+</script>
+{% endblock %}

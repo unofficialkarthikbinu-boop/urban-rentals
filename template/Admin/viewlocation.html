@@ -1,0 +1,105 @@
+{% load static %}
+{% include "Admin/header.html" %}
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="card-title">Location Management</h4>
+                            <span class="badge bg-primary">Total: {{ locationdata|length }}</span>
+                        </div>
+
+                        <!-- Display Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- SEARCH BOX -->
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+                                <input type="text" class="form-control" id="locationSearch" placeholder="Search locations or districts...">
+                            </div>
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th style="width: 50px;">#</th>
+                                        <th>District</th>
+                                        <th>Location</th>
+                                        <th class="text-center" style="width: 200px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for loc in locationdata %}
+                                    <tr class="location-search-item" data-text="{{ loc.district_id.district_name|lower }} {{ loc.location_name|lower }}">
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><span class="badge bg-secondary">{{ loc.district_id.district_name }}</span></td>
+                                        <td class="fw-bold">{{ loc.location_name }}</td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-2">
+                                                <a href="{% url 'editlocation' loc.location_id %}" class="btn btn-outline-primary btn-sm d-flex align-items-center justify-content-center" style="width: 90px;">
+                                                    <i class="fa-solid fa-pen-to-square me-1"></i> Edit
+                                                </a>
+                                                <a href="{% url 'deletelocation' loc.location_id %}" 
+                                                   class="btn btn-outline-danger btn-sm d-flex align-items-center justify-content-center" 
+                                                   style="width: 90px;"
+                                                   onclick="return confirm('Are you sure you want to delete {{ loc.location_name }}?');">
+                                                    <i class="fa-solid fa-trash me-1"></i> Delete
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="fa-solid fa-map-location-dot text-muted mb-3" style="font-size: 3rem;"></i>
+                                                <p class="text-muted">No locations found.</p>
+                                                <a href="{% url 'location' %}" class="btn btn-primary btn-sm mt-2">Add New Location</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "Admin/footer.html" %}
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const searchInput = document.getElementById("locationSearch");
+        const tableRows = document.querySelectorAll(".location-search-item");
+        
+        if (searchInput) {
+            searchInput.addEventListener("keyup", function() {
+                const value = this.value.toLowerCase().trim();
+                
+                tableRows.forEach(row => {
+                    const text = row.getAttribute("data-text");
+                    if (text && text.includes(value)) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                });
+            });
+        }
+    });
+</script>

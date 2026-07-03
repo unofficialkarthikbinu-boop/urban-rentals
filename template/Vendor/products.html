@@ -1,0 +1,163 @@
+{% load static %}
+{% include "Vendor/header.html" %}
+
+<main id="main">
+
+  <section class="section dashboard-section" style="padding-top: 120px; min-height: 80vh; display: block;">
+      <div class="container" style="display: block;">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-5">
+            <div>
+                <h2 class="fw-bold" style="color: var(--vendor-primary);">My Products</h2>
+                <p class="text-muted mb-0">Manage and organize your rental inventory</p>
+            </div>
+            <a href="{% url 'add_product' %}" class="btn btn-primary d-flex align-items-center gap-2 px-4 py-2 rounded-pill">
+                <i class="bi bi-plus-lg"></i> Add Product
+            </a>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="dashboard-card p-4 mb-4">
+            <div class="row g-3 align-items-center">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" class="form-control border-start-0 bg-light" id="searchInput" placeholder="Search products by name..." onkeyup="filterProducts()">
+                    </div>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <!-- Filters can be added here later -->
+                    <span class="text-muted small">Showing all {{ products|length }} products</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show rounded-3 border-0 shadow-sm" role="alert">
+                    <i class="bi bi-info-circle me-2"></i> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Products Grid -->
+        {% if products %}
+            <div class="row g-4" id="productsGrid">
+                {% for product in products %}
+                    <div class="col-xl-3 col-lg-4 col-md-6 product-item" data-product-name="{{ product.product_name|lower }}">
+                        <div class="dashboard-card h-100 p-0 overflow-hidden position-relative group-hover-effect">
+                            
+                            <!-- Product Image -->
+                            <div class="product-img-wrapper position-relative bg-light" style="height: 200px;">
+                                {% if product.product_image %}
+                                    <img src="{{ product.product_image.url }}" class="w-100 h-100" style="object-fit: contain;" alt="{{ product.product_name }}">
+                                {% else %}
+                                    <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted">
+                                        <i class="bi bi-image fs-1"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="position-absolute top-0 end-0 p-3">
+                                    <span class="badge rounded-pill {% if product.stock_quantity > 0 %}bg-success{% else %}bg-danger{% endif %} shadow-sm">
+                                        {% if product.stock_quantity > 0 %}Available{% else %}Out of Stock{% endif %}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Product Content -->
+                            <div class="p-4">
+                                <div class="mb-2">
+                                    <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem;">{{ product.category.category_name }}</small>
+                                </div>
+                                <h5 class="fw-bold mb-2 text-truncate" title="{{ product.product_name }}" style="color: var(--vendor-primary);">{{ product.product_name }}</h5>
+                                <p class="text-muted small mb-3 text-truncate">{{ product.product_description }}</p>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div>
+                                        <span class="fw-bold fs-5" style="color: var(--vendor-secondary);">₹{{ product.rent_price_per_day|default:product.rent_price_per_month }}</span>
+                                        <span class="text-muted small">/{% if product.rent_price_per_day %}day{% else %}mo{% endif %}</span>
+                                    </div>
+                                    <div class="text-muted small">
+                                        <i class="bi bi-box-seam me-1"></i> {{ product.stock_quantity }}
+                                    </div>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex">
+                                    <a href="{% url 'edit_product' product.product_id %}" class="btn btn-light btn-sm flex-grow-1 text-dark">
+                                        <i class="bi bi-pencil me-1"></i> Edit
+                                    </a>
+                                    <button type="button" class="btn btn-light btn-sm flex-grow-1 text-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal{{ product.product_id }}">
+                                        <i class="bi bi-trash me-1"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Delete Modal -->
+                    <div class="modal fade" id="deleteModal{{ product.product_id }}" tabindex="-1" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <div class="modal-content border-0 shadow">
+                                <div class="modal-header border-bottom-0">
+                                    <h5 class="modal-title fw-bold">Delete Product</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body py-4 text-center">
+                                    <div class="mb-3 text-danger">
+                                        <i class="bi bi-exclamation-circle" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <p class="mb-0">Are you sure you want to delete <strong>{{ product.product_name }}</strong>?</p>
+                                    <p class="text-muted small">This action cannot be undone.</p>
+                                </div>
+                                <div class="modal-footer border-top-0 justify-content-center pb-4">
+                                    <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Cancel</button>
+                                    <a href="{% url 'delete_product' product.product_id %}" class="btn btn-danger px-4">Delete Product</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="text-center py-5">
+                <div class="mb-4 text-muted opacity-25">
+                    <i class="bi bi-box-seam" style="font-size: 5rem;"></i>
+                </div>
+                <h3 class="fw-bold mb-3" style="color: var(--vendor-primary);">No Products Found</h3>
+                <p class="text-muted mb-4">You haven't added any products to your inventory yet.</p>
+                <a href="{% url 'add_product' %}" class="btn btn-primary px-4 py-2 rounded-pill">
+                    <i class="bi bi-plus-lg me-2"></i> Add First Product
+                </a>
+            </div>
+        {% endif %}
+
+      </div>
+  </section>
+
+</main>
+
+<script>
+    function filterProducts() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const grid = document.getElementById('productsGrid');
+        const items = grid.getElementsByClassName('product-item');
+
+        for (let i = 0; i < items.length; i++) {
+            const productName = items[i].getAttribute('data-product-name');
+            if (productName.includes(filter)) {
+                items[i].style.display = "";
+            } else {
+                items[i].style.display = "none";
+            }
+        }
+    }
+</script>
+
+{% include "Vendor/footer.html" %}

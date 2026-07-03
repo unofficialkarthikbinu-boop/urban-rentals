@@ -1,0 +1,81 @@
+{% load static %}
+{% include "Admin/header.html" %}
+
+<div class="main-panel">        
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Category Registration</h4>
+
+                        <!-- Alert Messages -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- FORM -->
+                        <form class="forms-sample" method="post" enctype="multipart/form-data">
+                            {% csrf_token %}
+
+                            <!-- Category Name -->
+                            <div class="form-group mb-3">
+                                <label for="categoryName" class="form-label">Category Name</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="categoryName" 
+                                    name="category_name" 
+                                    placeholder="Enter Category Name"
+                                    required
+                                    pattern="[A-Z][a-zA-Z\s]*" 
+                                    title="Name must start with a capital letter and contain only letters and spaces"
+                                >
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="description"
+                                    name="description" 
+                                    rows="3"
+                                    placeholder="Enter Category Description">
+                                </textarea>
+                            </div>
+
+                            <!-- Image Upload -->
+                            <div class="form-group mb-3">
+                                <label for="categoryImage" class="form-label">Category Image</label>
+                                <input 
+                                    type="file" 
+                                    class="form-control" 
+                                    id="categoryImage" 
+                                    name="category_image"
+                                    accept="image/*"
+                                >
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary me-2">
+                                Submit
+                            </button>
+                            <button type="reset" class="btn btn-light">
+                                Cancel
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% include "Admin/footer.html" %}

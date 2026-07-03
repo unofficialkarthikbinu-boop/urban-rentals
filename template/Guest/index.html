@@ -1,0 +1,382 @@
+{% load static %}
+{% include "Guest/header.html" %}
+
+<section class="pt-5 mt-5">
+  <div class="container">
+    <div class="row mt-5 pt-5">
+      <div class="col-md-6">
+        <h2 class="display-4 m-0">Welcome to <strong>Urban Rentals</strong> - Premium Furniture on Demand</h2>
+      </div>
+      <div class="col-md-6">
+        <p>Experience the freedom of flexible living. Rent high-quality, stylish furniture for your home or office. No
+          long-term commitments, just comfort and convenience delivered to your door.</p>
+        <div class="d-flex gap-2">
+          <a href="#new-arrival" class="btn btn-outline-dark rounded-pill px-5 py-3 mr-3">Browse Catalog</a>
+          <a href="{% url 'customer_registration' %}" class="btn btn-primary rounded-pill px-5 py-3">Register Now</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="text-center floating-image">
+    <img src="{% static 'guest/images/product-featured.png' %}" alt="featured product" class="img-fluid">
+  </div>
+</section>
+
+<section class="bg-primary pt-5">
+  <div class="container">
+    <div class="row justify-content-center pt-5 my-5">
+      <div class="col-md-6 pt-5 text-center">
+        <h2 class="display-5 pt-5 fw-bold">Why Choose Urban Rentals?</h2>
+        <p class="text-dark">We make furnishing your space simple, affordable, and flexible. Enjoy premium quality
+          without the commitment.</p>
+      </div>
+    </div>
+
+    <div class="row mb-5">
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="0">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#check"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Premium Quality</h5>
+              <p class="text-dark">All items are sanitized and refurbished to like-new condition.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="300">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#cart"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Wide Variety</h5>
+              <p class="text-dark">Choose from hundreds of styles for every room in your home.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="600">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#heart"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Flexible Rentals</h5>
+              <p class="text-dark">Rent for 3, 6, or 12 months. Extend or return anytime.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="900">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#arrow-cycle"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Easy Returns</h5>
+              <p class="text-dark">We pick up for free when your rental period ends.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="0">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#calendar"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Free Delivery & Assembly</h5>
+              <p class="text-dark">We deliver and set up strictly at your convenience.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="300">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#shopping-bag"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Upgrade Anytime</h5>
+              <p class="text-dark">Switch styles or upgrade products during your rental term.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="600">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#gift"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Damage Waiver</h5>
+              <p class="text-dark">Minor wear and tear is covered. Rent worry-free.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3" data-aos="fade-in" data-aos-delay="900">
+        <div class="py-5">
+          <div class="row g-1">
+            <div class="col-md-3">
+              <svg width="40" height="40" viewBox="0 0 24 24" class="text-dark">
+                <use xlink:href="#arrow-cycle"></use>
+              </svg>
+            </div>
+            <div class="col-md-9">
+              <h5 class="text-capitalize my-1">Buyout Options</h5>
+              <p class="text-dark">Love it? Keep it forever with our easy buyout plans.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row justify-content-center pt-5 my-5">
+      <div class="col-md-6 pt-5 text-center">
+        <h2 class="display-5 pt-5 fw-bold">Customer Reviews</h2>
+        <p class="text-dark">Lorem ip odio ratione consectetur consequatur excepturi natus illo illum incidunt minus
+          fuga quod enim omnis!</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="container-fluid pb-5">
+    <div class="swiper testimonial-swiper text-dark overflow-hidden my-5 pb-5">
+      <div class="swiper-wrapper d-flex">
+        <div class="swiper-slide">
+          <div class="testimonial-item text-center">
+            <blockquote>
+              <p>“Urban Rentals made moving so easy. The furniture arrived in perfect condition, and the team set
+                everything up in under an hour. Highly recommend!”</p>
+              <div class="review-title text-uppercase">Sarah Jenkins</div>
+              <span class="text-dark">Interior Designer</span>
+            </blockquote>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-item text-center">
+            <blockquote>
+              <p>“I love that I can swap out my living room set whenever I want. The flexibility is amazing, and the
+                prices are unbeatable for the quality you get.”</p>
+              <div class="review-title text-uppercase">Michael Chen</div>
+              <span class="text-dark">Software Engineer</span>
+            </blockquote>
+          </div>
+        </div>
+        <div class="swiper-slide">
+          <div class="testimonial-item text-center">
+            <blockquote>
+              <p>“As a student, buying furniture didn't make sense. Urban Rentals offered a great package deal that
+                furnished my entire apartment affordably.”</p>
+              <div class="review-title text-uppercase">Emily Rodriguez</div>
+              <span class="text-dark">Graduate Student</span>
+            </blockquote>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial-swiper-pagination d-flex justify-content-center mb-5"></div>
+
+  </div>
+</section>
+
+<section id="new-arrival" class="new-arrival py-5">
+  <div class="container-fluid">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mt-5 mb-3">
+      <h4 class="text-uppercase">Featured Rentals</h4>
+      <a href="{% url 'login' %}" class="btn-link">View All Products &rarr;</a>
+    </div>
+
+    <div data-aos="fade-in">
+      <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5">
+        {% if featured_products %}
+          {% for product in featured_products %}
+          <div class="col">
+            <div class="product-item hover-effect-slide">
+              <div class="image-holder position-relative">
+                <a href="javascript:alert('Authentication Required! Please login.');">
+                  {% if product.product_image %}
+                  <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="product-image img-fluid">
+                  {% else %}
+                  <img src="https://via.placeholder.com/250x250?text=No+Image" alt="No image" class="product-image img-fluid">
+                  {% endif %}
+                </a>
+                <a href="javascript:alert('Authentication Required! Please login.');" class="btn btn-dark w-100 mt-2 rounded-3">Add</a>
+              </div>
+              <div class="product-content">
+                <h5 class="text-capitalize fs-5 mt-3">
+                  <a href="javascript:alert('Authentication Required! Please login.');">{{ product.product_name }}</a>
+                </h5>
+                <span>₹{{ product.rent_price_per_month|default:product.rent_price_per_day }}/mo</span>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="col-12 text-center py-5">
+            <p class="text-muted">No featured products available.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+</section>
+<!-- 
+<section class="faqs py-5 my-5 text-dark">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-md-7">
+        <img src="{% static 'guest/images/side-banner.png' %}" alt="banner image" class="img-fluid">
+      </div>
+      <div class="col-md-5">
+        <h2 class="display-4 fw-bold">FAQs</h2>
+        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit.</p>
+        <p>Voluptatem nesciunt adipisci autem praesentium iure eveniet ea repudiandae reiciendis consequuntur ullam!
+          Laboriosam, vel! Neque atque, accusantium placeat voluptas labore qui et?</p>
+        <div class="accordion" id="accordionFaqs">
+          <div class="accordion-item border-bottom">
+            <h2 class="accordion-header" id="headingOne">
+              <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                data-bs-target="#accordion-collapse1" aria-expanded="true" aria-controls="accordion-collapse1">
+                Reasons to Visit a Furniture Showroom
+              </button>
+            </h2>
+            <div id="accordion-collapse1" class="accordion-collapse collapse show" aria-labelledby="headingOne"
+              data-bs-parent="#accordionFaqs">
+              <div class="accordion-body">
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+                  nulla pariatur.</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item border-bottom">
+            <h2 class="accordion-header" id="headingTwo">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#accordion-collapse2" aria-expanded="false" aria-controls="accordion-collapse2">
+                Benefits That Come With Buying New Furniture
+              </button>
+            </h2>
+            <div id="accordion-collapse2" class="accordion-collapse collapse" aria-labelledby="headingTwo"
+              data-bs-parent="#accordionFaqs">
+              <div class="accordion-body">
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+                  nulla pariatur.</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item border-bottom">
+            <h2 class="accordion-header" id="headingThree">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#accordion-collapse3" aria-expanded="false" aria-controls="accordion-collapse3">
+                Why is quality of furniture important?
+              </button>
+            </h2>
+            <div id="accordion-collapse3" class="accordion-collapse collapse" aria-labelledby="headingThree"
+              data-bs-parent="#accordionFaqs">
+              <div class="accordion-body">
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+                  nulla pariatur.</p>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="headingFour">
+              <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#accordion-collapse4" aria-expanded="false" aria-controls="accordion-collapse4">
+                What is the main purpose of furniture?
+              </button>
+            </h2>
+            <div id="accordion-collapse4" class="accordion-collapse collapse" aria-labelledby="headingFour"
+              data-bs-parent="#accordionFaqs">
+              <div class="accordion-body">
+                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+                  consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+                  nulla pariatur.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section> -->
+
+<section class="categories overflow-hidden my-5">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="jarallax position-relative mb-4" style="height:400px;">
+          <img src="{% static 'guest/images/category-banner-large-2.jpg' %}" alt="Offices"
+            class="jarallax-img img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
+          <div class="category-content position-absolute bottom-0 p-5 text-uppercase">
+            <h4 class="section-title text-white display-4 fw-bold">Offices</h4>
+            {% for subcategory in subcategories %}
+              {% if subcategory.subcategory_name|lower == 'office' or subcategory.subcategory_name|lower == 'offices' %}
+              <a href="{% url 'guest_browse_products' %}?subcategory={{ subcategory.subcategory_id }}" class="btn btn-light btn-lg mt-3">Browse Collection</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="jarallax position-relative mb-3" style="height:400px;">
+          <img src="{% static 'guest/images/category-banner-large-4.jpg' %}" alt="Living Room"
+            class="jarallax-img img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
+          <div class="category-content position-absolute bottom-0 p-5 text-uppercase">
+            <h4 class="section-title text-white display-4 fw-bold">Living Room</h4>
+            {% for subcategory in subcategories %}
+              {% if subcategory.subcategory_name|lower == 'living room' %}
+              <a href="{% url 'guest_browse_products' %}?subcategory={{ subcategory.subcategory_id }}" class="btn btn-light btn-lg mt-3">Browse Collection</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12">
+        <div class="jarallax position-relative mb-3" style="height:400px;">
+          <img src="{% static 'guest/images/category-banner-large-1.jpg' %}" alt="Bedroom"
+            class="jarallax-img img-fluid" style="object-fit: cover; width: 100%; height: 100%;">
+          <div class="category-content position-absolute bottom-0 p-5 text-uppercase">
+            <h4 class="section-title text-white display-4 fw-bold">Bedroom</h4>
+            {% for subcategory in subcategories %}
+              {% if subcategory.subcategory_name|lower == 'bedroom' %}
+              <a href="{% url 'guest_browse_products' %}?subcategory={{ subcategory.subcategory_id }}" class="btn btn-light btn-lg mt-3">Browse Collection</a>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% include "Guest/footer.html" %}

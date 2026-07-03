@@ -1,0 +1,647 @@
+{% load static %}
+{% include "Guest/header.html" %}
+
+<!-- Fonts & Icons needed for this form -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<section class="pt-5 mt-5">
+    <div class="container">
+      <div class="row mt-5 pt-5">
+        <div class="col-md-6">
+          <h2 class="display-4 m-0">Welcome to <strong>Urban Rentals</strong> - Premium Furniture on Demand</h2>
+        </div>
+        <div class="col-md-6">
+          <p>Experience the freedom of flexible living. Rent high-quality, stylish furniture for your home or office. No long-term commitments, just comfort and convenience delivered to your door.</p>
+          <div class="d-flex gap-2">
+            <a href="#new-arrival" class="btn btn-outline-dark rounded-pill px-5 py-3 mr-3">Browse Catalog</a>
+            <a href="{% url 'customer_registration' %}" class="btn btn-primary rounded-pill px-5 py-3">Register Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center floating-image">
+      <img src="{% static 'guest/images/product-featured.png' %}" alt="featured product" class="img-fluid">
+    </div>
+  </section>
+
+<style>
+    /* Premium Registration Page Styles */
+    :root {
+        --primary: #1e293b;
+        --accent: #4f46e5;
+        --accent-glow: rgba(79, 70, 229, 0.15);
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --bg-glass: rgba(255, 255, 255, 0.95);
+        --border-glass: rgba(255, 255, 255, 0.2);
+        --radius-lg: 24px;
+        --radius-md: 12px;
+        --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.1), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
+        background-color: #f8fafc;
+        color: var(--text-main);
+    }
+
+    body.modal-open {
+        overflow: hidden;
+        height: 100vh;
+    }
+
+    /* Modal Overlay (Translucent) */
+    .vendor-reg-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 1040;
+        overflow-y: auto;
+        padding: 20px;
+    }
+
+    .vendor-reg-container {
+        width: 100%;
+        max-width: 700px;
+        margin: 40px auto; 
+        animation: fadeInScale 0.6s ease-out;
+        position: relative;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.98) translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    .main-container {
+        background: white;
+        border-radius: var(--radius-lg);
+        display: block;
+        overflow: hidden;
+        box-shadow: var(--shadow-premium);
+        min-height: auto;
+    }
+
+    /* Form Section (Centered) */
+    .form-section {
+        padding: 60px 40px;
+        background: white;
+        position: relative;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 25px;
+        right: 25px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        border: none;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 16px;
+    }
+
+    .close-btn:hover {
+        background: #fee2e2;
+        color: #ef4444;
+        transform: rotate(90deg);
+    }
+
+    .form-header {
+        margin-bottom: 40px;
+        text-align: center;
+    }
+
+    .form-header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--text-main);
+        margin-bottom: 10px;
+    }
+
+    .form-header p {
+        color: var(--text-muted);
+        font-size: 15px;
+    }
+
+    /* Grid & Grouping */
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+    .full-width {
+        grid-column: span 2;
+    }
+
+    .section-title {
+        grid-column: span 2;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--accent);
+        letter-spacing: 1.5px;
+        margin: 20px 0 5px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: #f1f5f9;
+    }
+
+    /* Form Elements */
+    .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 13px;
+        color: #475569;
+    }
+
+    .input-wrapper {
+        position: relative;
+        transition: var(--transition);
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 14px;
+        pointer-events: none;
+        transition: var(--transition);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 14px 10px 42px;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        font-size: 14px;
+        color: var(--text-main);
+        background-color: #f8fafc;
+        transition: var(--transition);
+    }
+
+    .form-control:hover {
+        border-color: #cbd5e1;
+    }
+
+    .form-control:focus {
+        background-color: white;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-glow);
+        outline: none;
+    }
+
+    .form-control:focus+.input-icon {
+        color: var(--accent);
+    }
+
+    textarea.form-control {
+        min-height: 80px;
+        padding-top: 12px;
+    }
+
+    /* File Input Premium */
+    .file-input-container {
+        position: relative;
+        height: 48px;
+    }
+
+    .file-input-real {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+        z-index: 5;
+    }
+
+    .file-input-pseudo {
+        position: absolute;
+        inset: 0;
+        background: white;
+        border: 2px dashed #e2e8f0;
+        border-radius: var(--radius-md);
+        display: flex;
+        align-items: center;
+        padding-left: 42px;
+        color: var(--text-muted);
+        font-size: 13px;
+        transition: var(--transition);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 15px;
+    }
+
+    .file-input-container:hover .file-input-pseudo {
+        border-color: var(--accent);
+        background: #f5f3ff;
+    }
+
+    /* Password Toggle */
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 6px;
+        font-size: 14px;
+    }
+
+    /* Submit Button */
+    .submit-btn {
+        grid-column: span 2;
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 14px;
+        border-radius: var(--radius-md);
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        box-shadow: 0 4px 10px var(--accent-glow);
+    }
+
+    .submit-btn:hover {
+        background: #4338ca;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 18px var(--accent-glow);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 28px;
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .login-footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    /* Alerts */
+    .alert {
+        padding: 14px 18px;
+        border-radius: var(--radius-md);
+        margin-bottom: 28px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border: none;
+    }
+
+    .alert-error, .alert-danger {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .alert-success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .vendor-reg-container {
+            max-width: 95%;
+        }
+
+        .form-section {
+            padding: 40px 25px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .full-width {
+            grid-column: span 1;
+        }
+
+        .section-title {
+            grid-column: span 1;
+        }
+
+        .submit-btn {
+            grid-column: span 1;
+        }
+    }
+</style>
+
+<div class="vendor-reg-overlay" id="vendorRegOverlay">
+    <div class="vendor-reg-container" onclick="event.stopPropagation()">
+        <div class="main-container">
+            <!-- Registration Form Area -->
+            <div class="form-section">
+                <button type="button" class="close-btn" onclick="goBack()" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <div class="form-header">
+                    <h2>Join Urban Rentals</h2>
+                    <p>Partner with Urban Rentals to reach more customers.</p>
+                </div>
+
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}error{% else %}success{% endif %}">
+                    <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+                {% endif %}
+
+                <form method="post" id="registrationForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="form-grid">
+                        <!-- Personal -->
+                        <div class="section-title">Personal Information</div>
+
+                        <div class="form-group full-width">
+                            <label>Full Name</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-user input-icon"></i>
+                                <input type="text" name="name" class="form-control" placeholder="Johnathan Doe" required
+                                    pattern="[A-Z][a-zA-Z\s]*" title="Name must start with a capital letter">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-envelope input-icon"></i>
+                                <input type="email" name="email" class="form-control" placeholder="john@example.com" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Mobile Number</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-phone input-icon"></i>
+                                <input type="tel" name="phone" class="form-control" placeholder="9876543210" required
+                                    pattern="[6-9][0-9]{9}" title="Enter valid 10-digit number">
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div class="section-title">Service Location</div>
+
+                        <div class="form-group">
+                            <label>District</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-map input-icon"></i>
+                                <select name="district" id="district" class="form-control" required onchange="loadLocations()">
+                                    <option value="" disabled selected>Select District</option>
+                                    {% for d in districtdata %}
+                                    <option value="{{ d.district_id }}">{{ d.district_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Location</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-location-dot input-icon"></i>
+                                <select name="location" id="location" class="form-control" required>
+                                    <option value="" disabled selected>Select Location</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Address details</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-house-chimney input-icon" style="top: 24px;"></i>
+                                <textarea name="address" class="form-control"
+                                    placeholder="Shop No., Building, Street, Area..." required></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Business -->
+                        <div class="section-title">Business Details</div>
+
+                        <div class="form-group full-width">
+                            <label>GSTIN</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-file-invoice input-icon"></i>
+                                <input type="text" name="gstin" class="form-control" placeholder="Enter valid GSTIN" required>
+                            </div>
+                        </div>
+
+                        <!-- Verification -->
+                        <div class="section-title">Documents Verification</div>
+
+                        <div class="form-group">
+                            <label>Aadhar Proof</label>
+                            <div class="file-input-container">
+                                <i class="fas fa-id-card input-icon" style="z-index: 10;"></i>
+                                <input type="file" name="aadhar_proof" id="aadhar_proof" class="file-input-real"
+                                    accept="image/*,.pdf" required onchange="updateFileName(this, 'aadhar-label')">
+                                <div class="file-input-pseudo" id="aadhar-label">Upload Aadhar...</div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Shop License</label>
+                            <div class="file-input-container">
+                                <i class="fas fa-certificate input-icon" style="z-index: 10;"></i>
+                                <input type="file" name="shop_license" id="shop_license" class="file-input-real"
+                                    accept="image/*,.pdf" required onchange="updateFileName(this, 'license-label')">
+                                <div class="file-input-pseudo" id="license-label">Upload License...</div>
+                            </div>
+                        </div>
+
+                        <!-- Account -->
+                        <div class="section-title">Account Credentials</div>
+
+                        <div class="form-group">
+                            <label>Username</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-at input-icon"></i>
+                                <input type="text" name="username" class="form-control" placeholder="choose_username" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Password</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-shield-halved input-icon"></i>
+                                <input type="password" name="password" id="password" class="form-control"
+                                    placeholder="Minimum 6 characters" required>
+                                <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Action -->
+                        <button type="submit" class="submit-btn full-width">
+                            <span>Register as Vendor</span>
+                            <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <div class="login-footer">
+                    Already an Urban Rental member? <a href="{% url 'login' %}">Sign In</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "Guest/footer.html" %}
+
+<script>
+    // Modal functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('modal-open');
+
+        // Close on overlay click
+        const overlay = document.getElementById('vendorRegOverlay');
+        if (overlay) {
+            overlay.addEventListener('click', function (e) {
+                if (e.target === overlay) {
+                    goBack();
+                }
+            });
+        }
+    });
+
+    function goBack() {
+        document.body.classList.remove('modal-open');
+        window.history.back();
+    }
+
+    // Updated to handle multiple file inputs
+    function updateFileName(input, labelId) {
+        const label = document.getElementById(labelId);
+        if (input.files && input.files.length > 0) {
+            label.textContent = input.files[0].name;
+            label.style.color = '#0f172a';
+            label.style.borderColor = '#4f46e5';
+            label.style.backgroundColor = '#f5f3ff';
+        } else {
+            label.textContent = labelId.includes('aadhar') ? 'Upload Aadhar...' : 'Upload License...';
+            label.style.color = '#64748b';
+            label.style.borderColor = '#e2e8f0';
+            label.style.backgroundColor = 'white';
+        }
+    }
+
+    function togglePassword(fieldId) {
+        const field = document.getElementById(fieldId);
+        const btn = event.target.closest('.password-toggle');
+        const icon = btn.querySelector('i');
+
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    document.getElementById('registrationForm').addEventListener('submit', function (e) {
+        const password = document.getElementById('password').value;
+        const phone = document.querySelector('input[name="phone"]').value;
+
+        if (password.length < 6) {
+            e.preventDefault();
+            alert('Password must be at least 6 characters long!');
+            return false;
+        }
+
+        if (phone.length !== 10) {
+            e.preventDefault();
+            alert('Mobile number must be 10 digits!');
+            return false;
+        }
+    });
+
+    function loadLocations() {
+        const districtId = document.getElementById('district').value;
+        const locationSelect = document.getElementById('location');
+
+        if (districtId) {
+            locationSelect.innerHTML = '<option value="">Loading...</option>';
+
+            fetch(`/guestapp/get-locations/?district_id=${districtId}`)
+                .then(res => res.json())
+                .then(response => {
+                    locationSelect.innerHTML = '<option value="">Select Location</option>';
+                    if (response.success && response.locations) {
+                        response.locations.forEach(loc => {
+                            const option = document.createElement('option');
+                            option.value = loc.location_id;
+                            option.textContent = loc.location_name;
+                            locationSelect.appendChild(option);
+                        });
+                    } else {
+                        console.error('Error loading locations:', response.error);
+                    }
+                })
+                .catch(err => {
+                    locationSelect.innerHTML = '<option value="">Error loading locations</option>';
+                    console.error('Error:', err);
+                });
+        } else {
+            locationSelect.innerHTML = '<option value="">Select Location</option>';
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+{% load static %}
+{% include "Guest/header.html" %}
+
+<!-- Add Font Awesome -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<!-- Background Section (Same as Homepage) -->
+<section class="pt-5 mt-5">
+    <div class="container">
+      <div class="row mt-5 pt-5">
+        <div class="col-md-6">
+          <h2 class="display-4 m-0">Welcome back to <strong>Urban Rentals</strong></h2>
+        </div>
+        <div class="col-md-6">
+          <p>Sign in to manage your rentals, check your order status, or update your profile. We are glad to see you again.</p>
+          <div class="d-flex gap-2">
+            <a href="{% url 'customer_registration' %}" class="btn btn-outline-dark rounded-pill px-5 py-3 mr-3">New User? Register</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center floating-image">
+      <img src="{% static 'guest/images/product-featured.png' %}" alt="featured product" class="img-fluid">
+    </div>
+</section>
+
+<style>
+    /* Premium Login Styles */
+    :root {
+        --primary: #1e293b;
+        --accent: #4f46e5;
+        --accent-hover: #4338ca;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --radius-lg: 16px;
+        --radius-md: 8px;
+        --shadow-premium: 0 20px 40px -10px rgba(0, 0, 0, 0.2);
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        background-color: #f8fafc;
+        overflow: hidden; /* Prevent scrolling on body when modal is open */
+    }
+
+    /* Translucent Overlay */
+    .login-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 1040;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        width: 100%;
+        max-width: 420px;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-premium);
+        padding: 40px;
+        position: relative;
+        animation: slideUp 0.5s ease-out;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-header h2 {
+        font-weight: 700;
+        color: var(--text-main);
+        font-size: 24px;
+        margin-bottom: 8px;
+    }
+
+    .login-header p {
+        color: var(--text-muted);
+        font-size: 14px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-main);
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: var(--radius-md);
+        font-size: 15px;
+        transition: all 0.2s;
+        background: #fff;
+    }
+
+    .form-control:focus {
+        border-color: var(--accent);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-muted);
+        cursor: pointer;
+        padding: 4px;
+    }
+
+    .password-toggle:hover {
+        color: var(--accent);
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 14px;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 10px;
+    }
+
+    .btn-login:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+    }
+
+    .form-footer {
+        margin-top: 25px;
+        text-align: center;
+        font-size: 14px;
+        color: var(--text-muted);
+    }
+
+    .form-footer a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .form-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Professional Close Button */
+    .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        border: 1px solid transparent;
+    }
+
+    .close-btn:hover {
+        background: #fee2e2;
+        color: #ef4444;
+        transform: rotate(90deg);
+        border-color: #fecaca;
+    }
+
+    .close-btn i {
+        font-size: 16px;
+    }
+    
+    .alert {
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .alert-error, .alert-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+    .alert-success {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+</style>
+
+<div class="login-overlay">
+    <div class="login-card">
+        <!-- Close Button -->
+        <a href="{% url 'home' %}" class="close-btn" title="Back to Home">
+            <i class="fas fa-times"></i>
+        </a>
+
+        <!-- Logo -->
+        <!-- <div class="text-center mb-4">
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle mb-2" style="width: 50px; height: 50px; font-size: 20px;">
+                <i class="fas fa-couch"></i>
+            </div>
+            <h3 class="fw-bold m-0" style="color: var(--primary); font-size: 22px;">Urban Rentals</h3>
+        </div> -->
+
+        <div class="login-header">
+            <h2>Welcome Back</h2>
+            <p>Please enter your details to sign in</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <i class="fas fa-info-circle"></i> {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" id="loginForm">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+                    <button type="button" class="password-toggle" onclick="togglePassword()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-4" style="font-size: 13px;">
+                <label class="d-flex align-items-center gap-2 m-0 text-muted" style="cursor: pointer;">
+                    <input type="checkbox" name="remember" style="width: 14px; height: 14px;"> Remember me
+                </label>
+                <a href="#" style="color: var(--accent); text-decoration: none; font-weight: 500;">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-login">Sign In</button>
+
+            <div class="form-footer">
+                <div class="mb-3">
+                    Don't have an account? <a href="/guestapp/customerreg">Register as Customer</a>
+                </div>
+                <div>
+                   Want to rent? <a href="/guestapp/vendorreg/">Join as Vendor</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include "Guest/footer.html" %}
+
+<script>
+    function togglePassword() {
+        const passwordField = document.getElementById('password');
+        const icon = document.querySelector('.password-toggle i');
+        
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordField.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+</script>

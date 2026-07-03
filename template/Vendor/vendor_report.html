@@ -1,0 +1,75 @@
+{% load static %}
+{% include "Vendor/header.html" %}
+
+<main id="main" class="main" style="padding-top: 120px; min-height: 80vh;">
+    <div class="dashboard-container">
+        <div class="card p-4 shadow-sm border-0" style="border-radius: 15px;">
+            <h4 class="card-title text-center mb-4">My Sales Report</h4>
+
+            <form method="get" action="{% url 'vendor_report' %}" class="form-inline d-flex justify-content-center mb-4">
+                <div class="form-group mx-2">
+                    <label for="from_date" class="mr-2">From Date:</label>
+                    <input type="date" class="form-control" name="from_date" value="{{ from_date }}">
+                </div>
+                <div class="form-group mx-2">
+                    <label for="to_date" class="mr-2">To Date:</label>
+                    <input type="date" class="form-control" name="to_date" value="{{ to_date }}">
+                </div>
+                <div class="form-group mx-2">
+                    <button type="submit" class="btn btn-primary mr-2">Filter</button>
+                    {% if from_date or to_date %}
+                    <a href="{% url 'vendor_report_export' %}?from_date={{ from_date }}&to_date={{ to_date }}" class="btn btn-success">Export Excel</a>
+                    <a href="{% url 'vendor_report' %}" class="btn btn-secondary ml-2">Clear</a>
+                    {% else %}
+                    <a href="{% url 'vendor_report_export' %}" class="btn btn-success">Export Excel</a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="text-white" style="background: linear-gradient(90deg, #198754, #20c997);">
+                        <tr>
+                            <th scope="col" class="py-3 ps-3">Order #</th>
+                            <th scope="col" class="py-3">Product</th>
+                            <th scope="col" class="py-3">Customer</th>
+                            <th scope="col" class="py-3">Date</th>
+                            <th scope="col" class="py-3">Status</th>
+                            <th scope="col" class="py-3">Type</th>
+                            <th scope="col" class="py-3 pe-3">Total Rent</th>
+                        </tr>
+                    </thead>
+                    <tbody class="border-top-0">
+                        {% for item in order_items %}
+                        <tr>
+                            <td class="ps-3 fw-bold text-secondary">#{{ item.order.order_number }}</td>
+                            <td>{{ item.product.product_name }}</td>
+                            <td>{{ item.order.customer.name }}</td>
+                            <td>{{ item.order.created_at|date:"Y-m-d" }}</td>
+                            <td>
+                                {% if item.order.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% elif item.order.status == 'pending' %}
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif item.order.status == 'cancelled' %}
+                                    <span class="badge bg-danger">Cancelled</span>
+                                {% else %}
+                                    <span class="badge bg-info">{{ item.order.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ item.get_rent_type_display }}</td>
+                            <td>₹{{ item.total_rent }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center">No sales found for this period.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% include "Vendor/footer.html" %}

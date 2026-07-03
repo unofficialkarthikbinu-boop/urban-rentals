@@ -1,0 +1,616 @@
+{% load static %}
+{% include 'Vendor/header.html' %}
+
+<main id="main">
+    <style>
+        /* Theme Variables */
+        :root {
+            --vendor-primary: #0B2447;
+            --vendor-secondary: #19376D;
+            --vendor-accent: #576CBC;
+            --vendor-light: #A5D7E8;
+            --text-primary: #2c3e50;
+            --text-secondary: #6c757d;
+        }
+
+        /* Specific styles for Pickup/Assessment */
+        .dashboard-container {
+            padding-top: 120px;
+            min-height: 100vh;
+            padding-bottom: 8rem;
+        }
+
+        .dashboard-container .row {
+            display: flex;
+            flex-wrap: wrap;
+            /* Removed custom gap to rely on Bootstrap's grid correctly */
+        }
+
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--vendor-primary) 0%, var(--vendor-secondary) 100%);
+            color: white;
+            padding: 3.5rem 2rem;
+            margin-bottom: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(11, 36, 71, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+        }
+
+        .back-link {
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+            position: relative;
+            z-index: 1;
+        }
+
+        .back-link:hover {
+            color: #fff;
+            transform: translateX(-3px);
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header-content h1 {
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            font-size: 2.25rem;
+            letter-spacing: -0.5px;
+            color: white;
+        }
+
+        .header-content p {
+            opacity: 0.95;
+            font-size: 1.05rem;
+            margin-bottom: 0;
+            font-weight: 400;
+        }
+
+        /* Cards - Enhanced */
+        .dashboard-card {
+            background: #fff;
+            border-radius: 14px;
+            border: 1px solid #e8eaed;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.08);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dashboard-card.mb-4 {
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header-styled {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-bottom: 2px solid #eef0f3;
+            padding: 1.5rem 1.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title-styled {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--vendor-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: -0.3px;
+        }
+
+        .card-body-styled {
+            padding: 2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Info Lists - Enhanced */
+        .info-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .info-list li {
+            display: grid;
+            grid-template-columns: 140px 1fr;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-list li:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            opacity: 0.8;
+        }
+
+        .info-value {
+            font-weight: 700;
+            color: var(--vendor-primary);
+            text-align: right;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        /* Form Styles - Enhanced */
+        .form-section-title {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: var(--vendor-primary);
+            margin-bottom: 1.5rem;
+            margin-top: 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 3px solid var(--vendor-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        /* Defect Options - Enhanced */
+        .defect-option {
+            position: relative;
+            border: 2px solid #e8eaed;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .defect-option:hover {
+            border-color: var(--vendor-accent);
+            background-color: #f8f9fc;
+            box-shadow: 0 4px 12px rgba(87, 108, 203, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .defect-option.selected {
+            border-color: var(--vendor-accent);
+            border-width: 2px;
+            background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+            box-shadow: 0 4px 16px rgba(87, 108, 203, 0.2), inset 0 0 0 1px rgba(87, 108, 203, 0.1);
+        }
+
+        .defect-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .defect-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.08rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            letter-spacing: -0.2px;
+        }
+
+        .defect-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 2rem;
+            line-height: 1.5;
+        }
+
+        .check-icon {
+            width: 24px;
+            height: 24px;
+            border: 2.5px solid #dee2e6;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .defect-option.selected .check-icon {
+            border-color: var(--vendor-accent);
+            background-color: var(--vendor-accent);
+            box-shadow: 0 0 0 3px rgba(87, 108, 203, 0.1);
+        }
+
+        .defect-option.selected .check-icon::after {
+            content: '✓';
+            position: absolute;
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        /* File Upload - Enhanced */
+        .file-upload-wrapper {
+            border: 2px dashed var(--vendor-accent);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: linear-gradient(135deg, #f8f9fd 0%, #ffffff 100%);
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(87, 108, 203, 0.08);
+        }
+
+        .file-upload-wrapper:hover {
+            border-color: var(--vendor-primary);
+            background: linear-gradient(135deg, #f0f4ff 0%, #f8f9fd 100%);
+            box-shadow: 0 4px 16px rgba(87, 108, 203, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .upload-icon {
+            font-size: 2.8rem;
+            color: var(--vendor-accent);
+            margin-bottom: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .file-upload-wrapper:hover .upload-icon {
+            transform: scale(1.1);
+        }
+
+        .upload-text {
+            color: var(--text-primary);
+            font-weight: 700;
+            font-size: 0.95rem;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            height: 220px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin-top: 1.25rem;
+            display: none;
+            border: 2px solid var(--vendor-accent);
+            box-shadow: 0 4px 12px rgba(87, 108, 203, 0.2);
+        }
+
+        /* Buttons - Enhanced */
+        .btn-submit {
+            background: linear-gradient(135deg, var(--vendor-primary) 0%, var(--vendor-secondary) 100%);
+            color: white;
+            padding: 0.95rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(11, 36, 71, 0.25);
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(11, 36, 71, 0.35);
+            color: white;
+        }
+
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-cancel {
+            padding: 0.95rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            background-color: #f0f0f0;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid #e0e0e0;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-cancel:hover {
+            color: var(--vendor-primary);
+            background-color: #e8f0fb;
+            border-color: var(--vendor-accent);
+            transform: translateY(-2px);
+        }
+    </style>
+
+    <div class="container dashboard-container">
+        <!-- Page Header -->
+        <div class="page-header px-4">
+            <div class="container">
+                <a href="{% url 'vendor_return_requests' %}" class="back-link">
+                    <i class="bi bi-arrow-left me-2"></i>Back to Returns
+                </a>
+                <div class="header-content mt-2">
+                    <h1>Complete Pickup</h1>
+                    <p>Review returned item condition, document defects, and finalize refund amount.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alerts -->
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4 rounded-3"
+            role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row gx-4 gy-4">
+                <!-- Left Column: Request Details & Product Info -->
+                <div class="col-lg-4 d-flex flex-column" style="gap: 1.5rem;">
+
+                    <!-- Request Details -->
+                    <div class="dashboard-card mb-0">
+                        <div class="card-header-styled">
+                            <h5 class="card-title-styled"><i class="bi bi-receipt text-primary"></i> Request Details
+                            </h5>
+                        </div>
+                        <div class="card-body-styled">
+                            <ul class="info-list">
+                                <li>
+                                    <span class="info-label">Return Request ID</span>
+                                    <span class="info-value">#{{ return_req.return_id }}</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Customer Name</span>
+                                    <span class="info-value">{{ customer.name }}</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Phone Number</span>
+                                    <span class="info-value">{{ customer.phone }}</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Requested On</span>
+                                    <span class="info-value">{{ return_req.request_date|date:"M d, Y" }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Product Info -->
+                    <div class="dashboard-card mb-0 flex-grow-1">
+                        <div class="card-header-styled">
+                            <h5 class="card-title-styled"><i class="bi bi-box-seam text-success"></i> Product Info</h5>
+                        </div>
+                        <div class="card-body-styled">
+                            <div class="text-center mb-4">
+                                {% if product.product_image %}
+                                <img src="{{ product.product_image.url }}" alt="Product"
+                                    class="img-fluid rounded shadow-sm"
+                                    style="max-height: 160px; width: 100%; object-fit: contain; background: #f8f9fa; padding: 10px;">
+                                {% else %}
+                                <div class="bg-light rounded p-4 text-muted"><i class="bi bi-image fs-1"></i></div>
+                                {% endif %}
+                            </div>
+                            <ul class="info-list">
+                                <li>
+                                    <span class="info-label">Product Name</span>
+                                    <span class="info-value">{{ product.product_name }}</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Security Deposit</span>
+                                    <span class="info-value text-success">₹{{ order_item.security_deposit }}</span>
+                                </li>
+                                <li>
+                                    <span class="info-label">Rental End Date</span>
+                                    <span class="info-value">
+                                        {% if order_item.rental_end_date %}
+                                            {{ order_item.rental_end_date|date:"M d, Y" }}
+                                        {% else %}
+                                            <span class="text-muted fst-italic">Not specified</span>
+                                        {% endif %}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Assessment Form -->
+                <div class="col-lg-8">
+                    <div class="dashboard-card h-100 mb-0">
+                        <div class="card-header-styled">
+                            <h5 class="card-title-styled"><i class="bi bi-clipboard-check text-warning"></i> Damage
+                                Assessment</h5>
+                        </div>
+                        <div class="card-body-styled">
+
+                            <!-- Return Date -->
+                            <div class="mb-4">
+                                <h6 class="form-section-title">1. Confirmation</h6>
+                                <label class="form-label fw-bold">Actual Return Date</label>
+                                <input type="datetime-local" class="form-control" name="actual_return_date"
+                                    id="actualReturnDate" style="max-width: 300px;">
+                                <div class="form-text">Date and time when the item was physically collected.</div>
+                            </div>
+
+                            <!-- Defect Assessment -->
+                            <div class="mb-4">
+                                <h6 class="form-section-title">2. Condition Assessment</h6>
+
+                                <div class="defect-option selected" onclick="selectDefect(this)">
+                                    <input type="radio" name="defect_status" value="no_defect" checked>
+                                    <div class="defect-title">
+                                        <span class="check-icon"></span>
+                                        <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i> No
+                                            Defect</span>
+                                    </div>
+                                    <div class="defect-desc">Item is in good condition. Full security deposit will be
+                                        refunded.</div>
+                                </div>
+
+                                <div class="defect-option" onclick="selectDefect(this)">
+                                    <input type="radio" name="defect_status" value="minor">
+                                    <div class="defect-title">
+                                        <span class="check-icon"></span>
+                                        <span class="text-info"><i class="bi bi-info-circle-fill me-1"></i> Minor
+                                            Damage</span>
+                                        <span class="badge bg-light text-dark ms-auto">5% Deduction</span>
+                                    </div>
+                                    <div class="defect-desc">Small scratches, cosmetic wear, or minor stains that don't
+                                        affect function.</div>
+                                </div>
+
+                                <div class="defect-option" onclick="selectDefect(this)">
+                                    <input type="radio" name="defect_status" value="moderate">
+                                    <div class="defect-title">
+                                        <span class="check-icon"></span>
+                                        <span class="text-warning"><i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                            Moderate Damage</span>
+                                        <span class="badge bg-light text-dark ms-auto">15% Deduction</span>
+                                    </div>
+                                    <div class="defect-desc">Visible dents, broken non-essential parts, or significant
+                                        wear.</div>
+                                </div>
+
+                                <div class="defect-option" onclick="selectDefect(this)">
+                                    <input type="radio" name="defect_status" value="major">
+                                    <div class="defect-title">
+                                        <span class="check-icon"></span>
+                                        <span class="text-danger"><i class="bi bi-x-circle-fill me-1"></i> Major
+                                            Damage</span>
+                                        <span class="badge bg-light text-dark ms-auto">30% Deduction</span>
+                                    </div>
+                                    <div class="defect-desc">Broken essential parts, heavy structural damage, or
+                                        malfunction.</div>
+                                </div>
+                            </div>
+
+                            <!-- Description & Evidence -->
+                            <div class="row g-4 mb-4 flex-grow-1">
+                                <div class="col-md-6 d-flex flex-column">
+                                    <h6 class="form-section-title">3. Remarks</h6>
+                                    <label class="form-label fw-bold">Assessment Notes</label>
+                                    <textarea name="defect_description" class="form-control flex-grow-1"
+                                        style="min-height: 120px;"
+                                        placeholder="Enter details about the specific damage found (if any)..."></textarea>
+                                </div>
+                                <div class="col-md-6 d-flex flex-column">
+                                    <h6 class="form-section-title">4. Evidence</h6>
+                                    <label class="form-label fw-bold">Upload Photo (Optional)</label>
+                                    <div class="file-upload-wrapper flex-grow-1 d-flex flex-column align-items-center justify-content-center"
+                                        id="dropZone" style="padding: 1.5rem;">
+                                        <div id="uploadPlaceholder">
+                                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                                            <div class="upload-text">Click to upload photo</div>
+                                        </div>
+                                        <input type="file" name="defect_image" id="fileInput" class="d-none"
+                                            accept="image/*">
+                                        <img id="imagePreview" class="preview-image mt-0 w-100"
+                                            style="height: 120px; object-fit: contain;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-0 mb-4" style="margin-top: auto;">
+
+                            <div class="d-flex justify-content-end align-items-center gap-3">
+                                <a href="{% url 'vendor_return_requests' %}" class="btn-cancel">Cancel</a>
+                                <button type="submit" class="btn-submit">
+                                    <i class="bi bi-check2-circle me-2"></i>Complete & Process Refund
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</main>
+
+<script>
+    // Set default datetime to now
+    document.addEventListener('DOMContentLoaded', function () {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+        document.getElementById('actualReturnDate').value = now.toISOString().slice(0, 16);
+    });
+
+    // Defect Selection Logic
+    function selectDefect(element) {
+        // Remove class from all
+        document.querySelectorAll('.defect-option').forEach(el => el.classList.remove('selected'));
+        // Add class to clicked
+        element.classList.add('selected');
+        // Check radio button
+        element.querySelector('input[type="radio"]').checked = true;
+    }
+
+    // File Upload Preview
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadPlaceholder = document.getElementById('uploadPlaceholder');
+
+    dropZone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', function () {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                imagePreview.src = e.target.result;
+                imagePreview.style.display = 'block';
+                if (uploadPlaceholder) {
+                    uploadPlaceholder.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+</script>
+
+{% include 'Vendor/footer.html' %}

@@ -1,0 +1,251 @@
+{% load static %}
+{% include "Vendor/header.html" %}
+
+<main id="main" class="main">
+    <style>
+        /* Dashboard Layout */
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 50px;
+            padding-bottom: 5rem;
+        }
+
+        /* Sidebar Styling */
+        .dashboard-sidebar {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 2rem 1.5rem;
+            position: sticky;
+            top: 100px;
+            border: 1px solid #edf2f4;
+            border-top: 4px solid var(--vendor-secondary); /* Dark Navy Flair */
+        }
+
+        .user-brief {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .user-avatar {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--vendor-primary), var(--vendor-secondary));
+            color: #fff;
+            font-size: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(11, 36, 71, 0.2);
+        }
+
+        .nav-link-dashboard {
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.2rem;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin-bottom: 0.35rem;
+            font-weight: 500;
+            text-decoration: none;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link-dashboard:hover {
+            background-color: #f8f9fa;
+            color: var(--vendor-primary);
+            border-left-color: var(--vendor-accent);
+        }
+
+        .nav-link-dashboard.active {
+            background-color: #f0f7ff;
+            color: var(--vendor-secondary);
+            font-weight: 600;
+            border-left-color: var(--vendor-secondary);
+        }
+        
+        .nav-link-dashboard.text-danger:hover {
+            background-color: #fff5f5;
+            color: #dc3545;
+            border-left-color: #dc3545;
+        }
+
+        .nav-link-dashboard i {
+            margin-right: 14px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+            display: inline-block;
+        }
+
+        /* Main Content Styling */
+        .dashboard-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid #edf2f4;
+            transition: transform 0.2s;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .card-title-styled {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--vendor-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            border-color: #dee2e6;
+            border-radius: 8px;
+        }
+
+        .form-control:focus {
+            border-color: var(--vendor-accent);
+            box-shadow: 0 0 0 0.2rem rgba(87, 108, 188, 0.15);
+        }
+        
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.35rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status-pill.Approved { background: #d1e7dd; color: #0f5132; }
+        .status-pill.Pending { background: #fff3cd; color: #664d03; }
+        .status-pill.Rejected { background: #f8d7da; color: #842029; }
+
+    </style>
+
+    <div class="bg-light min-vh-100 py-4">
+        <div class="dashboard-container container">
+
+            <div class="row g-4">
+                
+                <!-- Sidebar Navigation -->
+                <div class="col-lg-3">
+                    <div class="dashboard-sidebar">
+                        <div class="user-brief">
+                            <div class="user-avatar text-uppercase">
+                                {{ vendor.name|slice:":1" }}
+                            </div>
+                            <h5 class="mb-1 fw-bold text-truncate" title="{{ vendor.name }}">{{ vendor.name }}</h5>
+                            <div class="text-muted small mb-2 text-truncate" title="{{ vendor.email }}">{{ vendor.email }}</div>
+                            <span class="status-pill {{ vendor.status|default:'Pending' }}">
+                                <i class="bi bi-shield-check me-2"></i> {{ vendor.status|default:'Pending' }}
+                            </span>
+                        </div>
+
+                        <nav class="nav flex-column">
+                            <a href="{% url 'vendor_profile' %}" class="nav-link-dashboard active">
+                                <i class="bi bi-person-badge"></i> Profile
+                            </a>
+                            <a href="{% url 'vendor_products' %}" class="nav-link-dashboard">
+                                <i class="bi bi-box-seam"></i> My Products
+                            </a>
+                            <a href="{% url 'add_product' %}" class="nav-link-dashboard">
+                                <i class="bi bi-plus-square"></i> Add Product
+                            </a>
+                            <a href="{% url 'vendor_orders' %}" class="nav-link-dashboard">
+                                <i class="bi bi-clipboard-data"></i> Orders
+                            </a>
+                            <a href="{% url 'vendor_return_requests' %}" class="nav-link-dashboard">
+                                <i class="bi bi-arrow-return-left"></i> Returns
+                            </a>
+                            <hr class="my-2 border-secondary-subtle">
+                            <a href="{% url 'logout' %}" class="nav-link-dashboard text-danger">
+                                <i class="bi bi-box-arrow-right"></i> Sign Out
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Main Content Area -->
+                <div class="col-lg-9">
+                    <!-- Edit Profile Card -->
+                    <div class="dashboard-card">
+                        <div class="section-header">
+                            <h2 class="card-title-styled"><i class="bi bi-pencil-square text-primary"></i> Edit Profile</h2>
+                            <a href="{% url 'vendor_profile' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Profile
+                            </a>
+                        </div>
+
+                        <form method="POST" action="{% url 'edit_profile' %}">
+                            {% csrf_token %}
+                            
+                            <div class="row g-4">
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label">Vendor Name *</label>
+                                    <input type="text" class="form-control" id="name" name="name" 
+                                           value="{{ vendor.name }}" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">Email Address *</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           value="{{ vendor.email }}" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="phone" class="form-label">Contact Phone *</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           value="{{ vendor.phone }}" required>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="gstin" class="form-label">GSTIN / Tax ID</label>
+                                    <input type="text" class="form-control" id="gstin" name="gstin" 
+                                           value="{{ vendor.gstin|default:'' }}">
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="address" class="form-label">Business Address *</label>
+                                    <textarea class="form-control" id="address" name="address" rows="3" required>{{ vendor.address }}</textarea>
+                                </div>
+                                
+                                <div class="col-12 text-end mt-4">
+                                    <a href="{% url 'vendor_profile' %}" class="btn btn-light me-2">Cancel</a>
+                                    <button type="submit" class="btn btn-primary px-4 bg-vendor-secondary">Save Changes</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% include "Vendor/footer.html" %}

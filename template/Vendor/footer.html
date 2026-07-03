@@ -1,0 +1,68 @@
+{% load static %}
+<footer id="footer" class="footer" style="background-color: var(--vendor-primary); color: #fff; padding-top: 50px; font-size: 0.9rem;">
+
+    <div class="container footer-top mb-4">
+      <div class="row gy-4">
+        <div class="col-lg-5 col-md-12 footer-about">
+          <a href="{% url 'vendor_home' %}" class="logo d-flex align-items-center text-decoration-none text-white mb-3">
+            <span class="sitename fs-4 fw-bold">UrbanRentals</span>
+          </a>
+          <p class="text-white-50">Empowering vendors to reach more customers. List your furniture and appliances with us and grow your rental business today.</p>
+          <div class="social-links d-flex mt-4 gap-3">
+            <a href="#" class="text-white-50"><i class="bi bi-twitter-x fs-5"></i></a>
+            <a href="#" class="text-white-50"><i class="bi bi-facebook fs-5"></i></a>
+            <a href="#" class="text-white-50"><i class="bi bi-instagram fs-5"></i></a>
+            <a href="#" class="text-white-50"><i class="bi bi-linkedin fs-5"></i></a>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4 class="text-white fw-bold mb-3">Quick Links</h4>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="{% url 'vendor_home' %}" class="text-white-50 text-decoration-none">Dashboard</a></li>
+            <li class="mb-2"><a href="{% url 'vendor_products' %}" class="text-white-50 text-decoration-none">My Products</a></li>
+            <li class="mb-2"><a href="{% url 'vendor_orders' %}" class="text-white-50 text-decoration-none">Orders</a></li>
+            <li class="mb-2"><a href="{% url 'vendor_profile' %}" class="text-white-50 text-decoration-none">My Profile</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-2 col-6 footer-links">
+          <h4 class="text-white fw-bold mb-3">Support</h4>
+          <ul class="list-unstyled">
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Help Center</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Terms of Service</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Privacy Policy</a></li>
+            <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">Contact Support</a></li>
+          </ul>
+        </div>
+
+        <div class="col-lg-3 col-md-12 footer-contact text-center text-md-start">
+          <h4 class="text-white fw-bold mb-3">Contact Us</h4>
+          <p class="text-white-50">A108 Adam Street</p>
+          <p class="text-white-50">New York, NY 535022</p>
+          <p class="mt-4 text-white-50"><strong>Phone:</strong> <span>+1 5589 55488 55</span></p>
+          <p class="text-white-50"><strong>Email:</strong> <span>info@urbanrentals.com</span></p>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="container copyright text-center py-4 border-top border-secondary border-opacity-25">
+      <p class="mb-0 text-white-50">© <span>Copyright</span> <strong class="text-white px-1">UrbanRentals</strong> <span>All Rights Reserved</span></p>
+      <div class="credits text-white-50 small mt-2">
+      </div>
+    </div>
+
+</footer>
+
+<!-- Vendor JS Files -->
+<script src="{% static 'vendor/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'vendor/assets/vendor/aos/aos.js' %}"></script>
+<script src="{% static 'vendor/assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+<script src="{% static 'vendor/assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+<!-- Main JS File -->
+<script src="{% static 'vendor/assets/js/main.js' %}"></script>
+
+</body>
+</html>

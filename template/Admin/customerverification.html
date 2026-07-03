@@ -1,0 +1,163 @@
+{% load static %}
+{% include "Admin/header.html" %}
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="card-title">Customer Verification</h4>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Total: {{ customers.count }}
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- ALERT MESSAGES -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- STATS SECTION -->
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-success text-white h-100">
+                                    <div class="card-body">
+                                        <h4 class="fw-normal mb-3">Verified</h4>
+                                        <h2 class="mb-0">{{ verified_count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-warning text-white h-100">
+                                    <div class="card-body">
+                                        <h4 class="fw-normal mb-3">Pending</h4>
+                                        <h2 class="mb-0">{{ pending_count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-danger text-white h-100">
+                                    <div class="card-body">
+                                        <h4 class="fw-normal mb-3">Rejected</h4>
+                                        <h2 class="mb-0">{{ rejected_count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TABLE CONTAINER -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Address</th>
+                                        <th class="text-center">ID Proof</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for c in customers %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-2" style="width: 36px; height: 36px; min-width: 36px;">
+                                                    {{ c.name|first|upper }}
+                                                </div>
+                                                <span class="fw-bold">{{ c.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td><a href="mailto:{{ c.email }}" class="text-decoration-none">{{ c.email }}</a></td>
+                                        <td>{{ c.phone }}</td>
+                                        <td><small class="d-block text-truncate" style="max-width: 150px;">{{ c.address }}</small></td>
+                                        <td class="text-center">
+                                            {% if c.id_proof %}
+                                                <a href="#" onclick="showImageModal('{{ c.id_proof.url }}', '{{ c.name }}'); return false;">
+                                                    <img src="{{ c.id_proof.url }}" alt="ID Proof" class="rounded border" style="width: 40px; height: 30px; object-fit: cover;">
+                                                </a>
+                                            {% else %}
+                                                <span class="badge bg-danger">Not Uploaded</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if c.is_verified %}
+                                                <span class="badge bg-success">Verified</span>
+                                            {% elif c.is_rejected %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if c.is_verified %}
+                                                <span class="badge bg-secondary">Approved</span>
+                                            {% else %}
+                                                <a href="{% url 'verify_customer' c.customer_id %}" class="btn btn-success btn-sm me-1" title="Approve">
+                                                    <i class="fa-solid fa-check"></i>
+                                                </a>
+                                                {% if not c.is_rejected %}
+                                                    <a href="{% url 'reject_customer' c.customer_id %}" class="btn btn-danger btn-sm" title="Reject">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="fa-solid fa-users-slash text-muted mb-3" style="font-size: 3rem;"></i>
+                                                <p class="text-muted">No Customers Found</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "Admin/footer.html" %}
+</div>
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">ID Proof</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" alt="ID Proof" class="img-fluid rounded shadow-sm">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showImageModal(imageUrl, name) {
+        document.getElementById('modalImage').src = imageUrl;
+        document.getElementById('modalTitle').textContent = 'ID Proof - ' + name;
+        var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+        myModal.show();
+    }
+</script>

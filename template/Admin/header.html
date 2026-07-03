@@ -1,0 +1,1298 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>UrbanRentals Admin</title>
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Plugins -->
+    <link rel="stylesheet" href="{% static 'admin/vendors/ti-icons/css/themify-icons.css' %}">
+
+    <!-- Custom Admin Theme -->
+    <link rel="stylesheet" href="{% static 'admin/css/admin-theme.css' %}">
+
+    <link rel="shortcut icon" href="{% static 'admin/images/favicon.png' %}" />
+    <style>
+        /* ===== ADMIN HEADER STYLES — PREMIUM REDESIGN ===== */
+
+        /* Animated gradient keyframes */
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: -200% center;
+            }
+
+            100% {
+                background-position: 200% center;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        @keyframes glowPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(255, 200, 55, 0.3);
+            }
+
+            50% {
+                box-shadow: 0 0 20px rgba(255, 200, 55, 0.55);
+            }
+        }
+
+        @keyframes accentSlide {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        @keyframes bellSwing {
+
+            0%,
+            100% {
+                transform: rotate(0deg);
+            }
+
+            15% {
+                transform: rotate(14deg);
+            }
+
+            30% {
+                transform: rotate(-10deg);
+            }
+
+            45% {
+                transform: rotate(6deg);
+            }
+
+            60% {
+                transform: rotate(-3deg);
+            }
+
+            75% {
+                transform: rotate(1deg);
+            }
+        }
+
+        /* Container and Layout */
+        .container-scroller {
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 30%, #a78bfa 60%, #7c3aed 100%);
+            background-size: 300% 300%;
+            animation: gradientShift 8s ease infinite;
+            box-shadow:
+                0 4px 30px rgba(139, 92, 246, 0.35),
+                0 1px 0 rgba(0, 0, 0, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-bottom: none;
+            backdrop-filter: blur(16px);
+            padding: 0;
+            height: 72px;
+            z-index: 1000;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Animated accent line at bottom of header */
+        .navbar::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #fbbf24, #f472b6, #818cf8, #34d399, #fbbf24);
+            background-size: 200% 100%;
+            animation: accentSlide 4s linear infinite;
+        }
+
+        .navbar-menu-wrapper {
+            padding: 0 2rem;
+            height: 72px;
+            gap: 1.5rem;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+        }
+
+        /* ===== BRAND LOGO SECTION ===== */
+        .navbar-brand-wrapper {
+            width: 275px;
+            background: rgba(255, 255, 255, 0.04);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1.5rem;
+        }
+
+        .brand-logo-inner {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .brand-logo-inner:hover {
+            transform: scale(1.04);
+        }
+
+        .brand-icon-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 255, 255, 0.18);
+            border-radius: 14px;
+            box-shadow:
+                0 8px 24px rgba(0, 0, 0, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25),
+                0 0 0 1px rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: glowPulse 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brand-icon-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, transparent 50%);
+            border-radius: inherit;
+        }
+
+        .brand-logo-inner:hover .brand-icon-wrapper {
+            transform: rotateZ(8deg) scale(1.18) translateY(-3px);
+            box-shadow:
+                0 14px 36px rgba(0, 0, 0, 0.22),
+                inset 0 1px 0 rgba(255, 255, 255, 0.35),
+                0 0 24px rgba(251, 191, 36, 0.35);
+        }
+
+        .brand-icon-wrapper.mini {
+            width: 36px;
+            height: 36px;
+        }
+
+        .brand-icon {
+            color: #ffffff;
+            font-size: 21px;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+            position: relative;
+            z-index: 1;
+        }
+
+        .brand-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            font-size: 20px;
+            letter-spacing: 1px;
+            color: #ffffff;
+            background: linear-gradient(90deg, #fff 0%, rgba(255, 255, 255, 0.85) 40%, #fff 80%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-transform: uppercase;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .brand-highlight {
+            font-weight: 600;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b, #fbbf24);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 3s linear infinite;
+        }
+
+        .brand-logo-mini-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== LEFT MENU ITEMS ===== */
+        .left-menu-items {
+            gap: 1rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+        }
+
+        .navbar-toggler {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 10px 13px;
+            color: #ffffff;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.35);
+            color: #ffffff;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .navbar-toggler:active {
+            transform: translateY(0) scale(0.97);
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.18);
+            outline: none;
+        }
+
+        .navbar-toggler i {
+            font-size: 16px;
+            color: #ffffff;
+        }
+
+        .header-title {
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 16px;
+            letter-spacing: 0.8px;
+            transition: all 0.25s ease;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.75));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .header-title::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #fbbf24, #f472b6);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .header-title:hover::after {
+            width: 100%;
+        }
+
+        /* ===== SEARCH SECTION ===== */
+        .navbar-search-wrapper {
+            flex: 1;
+            max-width: 480px;
+            margin: 0 1.5rem;
+            justify-content: center;
+        }
+
+        .search-container {
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 50px;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+            backdrop-filter: blur(12px);
+            position: relative;
+        }
+
+        .search-container::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.4), rgba(244, 114, 182, 0.4), rgba(129, 140, 248, 0.4));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .search-container:hover {
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.28);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-container:focus-within {
+            background: rgba(255, 255, 255, 0.97);
+            border-color: transparent;
+            box-shadow:
+                0 8px 32px rgba(124, 58, 237, 0.18),
+                0 0 0 3px rgba(139, 92, 246, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .search-container:focus-within::before {
+            opacity: 1;
+        }
+
+        .search-icon-container {
+            background: transparent;
+            padding: 10px 0 10px 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon-container i {
+            color: rgba(255, 255, 255, 0.65);
+            font-size: 14px;
+            transition: all 0.35s ease;
+        }
+
+        .search-container:focus-within .search-icon-container i {
+            color: #7c3aed;
+            transform: scale(1.15) rotate(-5deg);
+        }
+
+        .search-input {
+            padding: 10px 0 10px 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            color: #ffffff;
+            background: transparent;
+            letter-spacing: 0.3px;
+        }
+
+        .search-container:focus-within .search-input {
+            color: #1e1b4b;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+
+        .search-container:focus-within .search-input::placeholder {
+            color: rgba(124, 58, 237, 0.35);
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        .search-shortcut {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 0 16px 0 4px;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            background: transparent;
+        }
+
+        .search-container:focus-within .search-shortcut {
+            opacity: 0;
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .search-shortcut kbd {
+            font-family: 'Poppins', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 2px 7px;
+            line-height: 1.4;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+        }
+
+        /* ===== RIGHT NAVBAR ITEMS ===== */
+        .navbar-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Notification Dropdown */
+        .nav-link.count-indicator {
+            padding: 9px 12px;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            position: relative;
+        }
+
+        .nav-link.count-indicator:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .nav-link.count-indicator:hover .icon-box i {
+            animation: bellSwing 0.8s ease-in-out;
+        }
+
+        .icon-box {
+            position: relative;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .icon-box i {
+            color: #ffffff;
+            font-size: 18px;
+            transition: all 0.25s ease;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+        }
+
+        .nav-link.count-indicator:hover .icon-box i {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 11px;
+            height: 11px;
+            background: linear-gradient(135deg, #f43f5e 0%, #ef4444 100%);
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 2px 8px rgba(244, 63, 94, 0.5);
+        }
+
+        .count.pulse {
+            animation: pulse-notification 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-notification {
+
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.7);
+            }
+
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 0 0 10px rgba(244, 63, 94, 0);
+            }
+        }
+
+        /* Profile Section */
+        .nav-profile .nav-link {
+            padding: 6px 12px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+        }
+
+        .nav-profile .nav-link:hover {
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .profile-info {
+            text-align: right;
+        }
+
+        .profile-info .name {
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 13.5px;
+            line-height: 1.3;
+            letter-spacing: 0.3px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+        }
+
+        .profile-info .designation {
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 10.5px;
+            line-height: 1.2;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .profile-pic-wrapper {
+            position: relative;
+        }
+
+        .profile-pic-wrapper::after {
+            content: '';
+            position: absolute;
+            bottom: 1px;
+            right: 1px;
+            width: 10px;
+            height: 10px;
+            background: #34d399;
+            border-radius: 50%;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
+            z-index: 2;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2.5px solid rgba(255, 255, 255, 0.45);
+            object-fit: cover;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-profile .nav-link:hover .profile-pic {
+            border-color: rgba(255, 255, 255, 0.85);
+            transform: scale(1.12);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2), 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== DROPDOWN MENUS ===== */
+        .dropdown-menu {
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.15),
+                0 0 0 1px rgba(0, 0, 0, 0.03);
+            border-radius: 18px;
+            padding: 0;
+            margin-top: 14px;
+            min-width: 320px;
+            overflow: hidden;
+            animation-duration: 0.3s;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.98);
+        }
+
+        .dropdown-header {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e8ecf4 100%);
+            padding: 18px 20px 14px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+        }
+
+        .dropdown-header p {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            color: #1e1b4b;
+            font-size: 15px;
+            margin: 0;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+        }
+
+        .dropdown-header .badge {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+            letter-spacing: 0.4px;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-header .badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
+
+        .dropdown-divider {
+            background: linear-gradient(90deg, transparent 0%, rgba(99, 102, 241, 0.1) 50%, transparent 100%);
+            margin: 0;
+            height: 1px;
+            border: none;
+        }
+
+        .dropdown-item {
+            padding: 14px 20px;
+            color: #3f3f46;
+            font-family: 'Poppins', sans-serif;
+            font-size: 13.5px;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dropdown-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, #6366f1, #a855f7);
+            transform: scaleY(0);
+            transition: transform 0.25s ease;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(168, 85, 247, 0.03) 100%);
+            color: #6366f1;
+            padding-left: 26px;
+        }
+
+        .dropdown-item:hover::before {
+            transform: scaleY(1);
+        }
+
+        /* Profile Dropdown Specific */
+        .profile-dropdown .dropdown-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 16px 14px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #ede9fe 100%);
+        }
+
+        .profile-dropdown .profile-pic {
+            width: 48px;
+            height: 48px;
+            margin: 0;
+            border-color: rgba(99, 102, 241, 0.25);
+        }
+
+        .profile-item i {
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+            transition: all 0.25s ease;
+        }
+
+        .dropdown-item:hover .profile-item i {
+            transform: scale(1.2);
+        }
+
+        /* Notification Items */
+        .preview-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 18px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.02);
+        }
+
+        .preview-item:last-child {
+            border-bottom: none;
+        }
+
+        .preview-item:hover {
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.06) 0%, rgba(168, 85, 247, 0.03) 100%);
+            transform: translateX(3px);
+        }
+
+        .preview-thumbnail {
+            flex-shrink: 0;
+        }
+
+        .preview-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(72, 187, 120, 0.15);
+            transition: all 0.25s ease;
+        }
+
+        .preview-item:hover .preview-icon {
+            transform: scale(1.08);
+        }
+
+        .bg-soft-success {
+            background: linear-gradient(135deg, rgba(52, 211, 153, 0.15) 0%, rgba(52, 211, 153, 0.06) 100%);
+        }
+
+        .preview-icon i {
+            font-size: 16px;
+        }
+
+        .preview-item-content h6 {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            margin-bottom: 3px;
+            color: #1e1b4b;
+            letter-spacing: 0.3px;
+        }
+
+        .preview-item-content p {
+            font-size: 11.5px;
+            color: rgba(99, 102, 241, 0.55);
+            margin: 0;
+            font-weight: 500;
+        }
+
+        .notification-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            background: linear-gradient(135deg, #f43f5e 0%, #ef4444 100%);
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 800;
+            box-shadow: 0 4px 14px rgba(244, 63, 94, 0.35);
+            letter-spacing: 0.3px;
+        }
+
+        .dropdown-section-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6366f1;
+            padding: 12px 18px;
+            background: linear-gradient(90deg, rgba(99, 102, 241, 0.05) 0%, rgba(168, 85, 247, 0.02) 100%);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 991.98px) {
+            .navbar-brand-wrapper {
+                width: 55px;
+            }
+
+            .brand-logo {
+                display: none;
+            }
+
+            .brand-logo-mini {
+                display: block;
+            }
+
+            .header-title {
+                display: none;
+            }
+
+            .navbar-search-wrapper {
+                display: none;
+            }
+
+            .profile-info {
+                display: none;
+            }
+
+            .navbar {
+                height: 64px;
+            }
+
+            .navbar-menu-wrapper {
+                height: 64px;
+                padding: 0 1rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .navbar-menu-wrapper {
+                padding: 0 0.75rem;
+            }
+
+            .left-menu-items {
+                gap: 0.5rem;
+            }
+
+            .navbar-nav-right {
+                gap: 0.5rem;
+            }
+        }
+
+        /* ===== ANIMATION CLASSES ===== */
+        .animate__animated {
+            animation-duration: 0.3s;
+            animation-fill-mode: both;
+        }
+
+        .animate__fadeIn {
+            animation-name: fadeIn;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ===== UTILITY CLASSES ===== */
+        .shadow-sm {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .shadow-lg {
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12) !important;
+        }
+
+        .text-success {
+            color: #34d399 !important;
+        }
+
+        .text-primary {
+            color: #6366f1 !important;
+        }
+
+        .text-danger {
+            color: #f43f5e !important;
+        }
+
+        .text-muted {
+            color: #94a3b8 !important;
+        }
+
+        .font-weight-bold {
+            font-weight: 600 !important;
+        }
+
+        .font-weight-medium {
+            font-weight: 500 !important;
+        }
+
+        .font-weight-light {
+            font-weight: 400 !important;
+        }
+
+        .small-text {
+            font-size: 12px !important;
+        }
+
+        .rounded-4 {
+            border-radius: 1.125rem !important;
+        }
+    </style>
+
+    <!-- Sidebar Styles -->
+    <style>
+        /* ===== SIDEBAR STYLES ===== */
+        .sidebar {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
+            border-right: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 1.5rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0 0.8rem;
+        }
+
+        .sidebar .nav-item {
+            position: relative;
+        }
+
+        .sidebar .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            color: #4a5568;
+            font-size: 14px;
+            font-weight: 500;
+            border-radius: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar .nav-link:hover {
+            background: rgba(102, 126, 234, 0.08);
+            color: #667eea;
+            padding-left: 20px;
+            transform: translateX(2px);
+        }
+
+        .sidebar .nav-link:hover::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar .nav-link .menu-icon {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+            transition: all 0.25s ease;
+            color: inherit;
+        }
+
+        .sidebar .nav-link:hover .menu-icon {
+            color: #667eea;
+            transform: scale(1.15);
+        }
+
+        .sidebar .nav-link .menu-title {
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.3px;
+            transition: all 0.25s ease;
+        }
+
+        .sidebar .nav-link.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12) 0%, rgba(118, 75, 162, 0.08) 100%);
+            color: #667eea;
+            box-shadow: inset 0 2px 6px rgba(102, 126, 234, 0.1);
+        }
+
+        .sidebar .nav-link.active::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar .nav-link.active .menu-icon {
+            color: #667eea;
+            transform: scale(1.1);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 991.98px) {
+            .sidebar {
+                position: fixed;
+                left: -260px;
+                top: 72px;
+                width: 260px;
+                height: calc(100vh - 72px);
+                background: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%);
+                box-shadow: 2px 0 12px rgba(0, 0, 0, 0.1);
+                border-right: 1px solid rgba(0, 0, 0, 0.05);
+                z-index: 999;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .sidebar-offcanvas.active {
+                left: 0;
+            }
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <div class="container-scroller">
+
+        <!-- Navbar -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                <a class="navbar-brand brand-logo text-decoration-none" href="{% url 'admin_home' %}">
+                    <div class="brand-logo-inner">
+                        <span class="brand-text">Urban<span class="brand-highlight">Rentals</span></span>
+                    </div>
+                </a>
+            </div>
+
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-between">
+                <!-- Left Section: Toggle & Title -->
+                <div class="d-flex align-items-center left-menu-items">
+                    <button class="navbar-toggler align-self-center shadow-none" type="button" data-toggle="minimize">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h5 class="mb-0 d-none d-lg-block ms-3 header-title">Admin Dashboard</h5>
+                </div>
+
+                <!-- Center Section: Modern Search -->
+                <div class="navbar-search-wrapper d-none d-lg-flex">
+                    <div class="input-group search-container">
+                        <span class="input-group-text border-0 search-icon-container">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" class="form-control border-0 search-input" placeholder="Search anything..."
+                            aria-label="search" id="adminSearchInput">
+                        <span class="input-group-text border-0 search-shortcut">
+                            <kbd>Ctrl</kbd><kbd>K</kbd>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Right Section: Tools -->
+                <ul class="navbar-nav navbar-nav-right">
+                    <!-- Notifications -->
+                    <li class="nav-item dropdown me-3">
+                        <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center"
+                            id="notificationDropdown" href="#" data-bs-toggle="dropdown">
+                            <div class="icon-box">
+                                <i class="fa-regular fa-bell"></i>
+                                <span class="count pulse"></span>
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list shadow-lg border-0 rounded-4 animate__animated animate__fadeIn"
+                            aria-labelledby="notificationDropdown">
+                            <div class="dropdown-header">
+                                <p class="mb-0 font-weight-bold">Notifications</p>
+                                <span class="badge badge-pill badge-primary float-right">View all</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item preview-item">
+                                <div class="preview-thumbnail">
+                                    <div class="preview-icon bg-soft-success">
+                                        <i class="ti-info-alt mx-0 text-success"></i>
+                                    </div>
+                                </div>
+                                <div class="preview-item-content">
+                                    <h6 class="preview-subject font-weight-medium">Application Error</h6>
+                                    <p class="font-weight-light small-text mb-0 text-muted">
+                                        Just now
+                                    </p>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+
+                    <!-- Profile -->
+                    <li class="nav-item nav-profile dropdown">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" data-bs-toggle="dropdown"
+                            id="profileDropdown">
+                            <div class="profile-info d-none d-lg-flex flex-column align-items-end me-3">
+                                <span class="name">Admin</span>
+                                <span class="designation">Administrator</span>
+                            </div>
+                            <div class="profile-pic-wrapper">
+                                <img src="{% static 'admin/images/faces/face28.jpg' %}" alt="profile"
+                                    class="profile-pic shadow-sm" />
+                            </div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right navbar-dropdown profile-dropdown shadow-lg border-0 rounded-4 animate__animated animate__fadeIn"
+                            aria-labelledby="profileDropdown">
+                            <div class="dropdown-header d-flex align-items-center">
+                                <img src="{% static 'admin/images/faces/face28.jpg' %}" alt="profile"
+                                    class="profile-pic me-3" />
+                                <div>
+                                    <h6 class="mb-0 font-weight-bold">Admin</h6>
+                                    <p class="mb-0 text-muted small">admin@urbanrentals.com</p>
+                                </div>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item profile-item">
+                                <i class="ti-settings text-primary me-2"></i>
+                                Settings
+                            </a>
+                            <a class="dropdown-item profile-item" href="{% url 'logout' %}">
+                                <i class="ti-power-off text-danger me-2"></i>
+                                Logout
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+
+                <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center shadow-none"
+                    type="button" data-toggle="offcanvas">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </nav>
+
+
+        <!-- Page Body Wrapper -->
+        <div class="container-fluid page-body-wrapper">
+
+            <!-- Sidebar -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin_home' %}">
+                            <i class="fa-solid fa-gauge-high menu-icon"></i>
+                            <span class="menu-title">Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'categoryreg' %}">
+                            <i class="fa-solid fa-folder-plus menu-icon"></i>
+                            <span class="menu-title">Add Category</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'viewcategory' %}">
+                            <i class="fa-solid fa-list menu-icon"></i>
+                            <span class="menu-title">View Categories</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'subcategory_registration' %}">
+                            <i class="fa-solid fa-layer-group menu-icon"></i>
+                            <span class="menu-title">Add Subcategory</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'viewsubcategory' %}">
+                            <i class="fa-solid fa-list-check menu-icon"></i>
+                            <span class="menu-title">View Subcategories</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'district' %}">
+                            <i class="fa-solid fa-map menu-icon"></i>
+                            <span class="menu-title">Add District</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'viewdistrict' %}">
+                            <i class="fa-solid fa-map-location menu-icon"></i>
+                            <span class="menu-title">View Districts</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'location' %}">
+                            <i class="fa-solid fa-map-pin menu-icon"></i>
+                            <span class="menu-title">Add Location</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'viewlocation' %}">
+                            <i class="fa-solid fa-map-location-dot menu-icon"></i>
+                            <span class="menu-title">View Locations</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'customer_verification' %}">
+                            <i class="fa-solid fa-user-check menu-icon"></i>
+                            <span class="menu-title">Customer Verify</span>
+                            {% if pending_customer_count > 0 %}
+                            <span class="badge rounded-pill bg-danger" style="margin-left: auto;">{{ pending_customer_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'vendor_verification' %}">
+                            <i class="fa-solid fa-store menu-icon"></i>
+                            <span class="menu-title">Vendor Verify</span>
+                            {% if pending_vendor_count > 0 %}
+                            <span class="badge rounded-pill bg-danger" style="margin-left: auto;">{{ pending_vendor_count }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'admin_sales_report' %}">
+                            <i class="fa-solid fa-chart-line menu-icon"></i>
+                            <span class="menu-title">Sales Report</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Main Panel -->
+            <!-- Starts in specific templates -->
+
+            <script>
+                // Ctrl+K shortcut to focus the search bar
+                document.addEventListener('keydown', function (e) {
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                        e.preventDefault();
+                        var searchInput = document.getElementById('adminSearchInput');
+                        if (searchInput) searchInput.focus();
+                    }
+                });
+            </script>

@@ -1,0 +1,456 @@
+{% load static %}
+{% include "Admin/header.html" %}
+<!-- partial -->
+<div class="main-panel">
+  <div class="content-wrapper"
+    style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 30%, #f0f4ff 70%, #f5f3ff 100%); min-height: 100vh; padding: 2rem 2.5rem;">
+
+    <!-- Dashboard Header -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <div>
+            <h2
+              style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 28px; color: #1e1b4b; margin-bottom: 6px; letter-spacing: -0.5px;">
+              <i class="fa-solid fa-gauge-high" style="color: #7c3aed; margin-right: 10px; font-size: 24px;"></i>Admin
+              Dashboard
+            </h2>
+            <p
+              style="font-family: 'Poppins', sans-serif; font-size: 14px; color: #64748b; font-weight: 500; margin: 0; letter-spacing: 0.1px;">
+              Overview of system performance and key metrics.
+            </p>
+          </div>
+          <div class="d-flex align-items-center gap-3">
+            <span
+              style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 14px rgba(124,58,237,0.25); letter-spacing: 0.3px;">
+              <i class="fa-regular fa-calendar" style="margin-right: 8px;"></i>{% now "F j, Y" %}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Metrics Cards -->
+    <div class="row mb-4" style="display: flex; flex-wrap: wrap;">
+      <!-- Total Revenue -->
+      <div class="col-xl col-md-6 mb-4 d-flex">
+        <div
+          style="background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%); border-radius: 20px; padding: 28px 24px; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(124,58,237,0.2); transition: all 0.3s ease; cursor: default; width: 100%; min-height: 140px;"
+          class="metric-card"
+          onmouseenter="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 14px 40px rgba(124,58,237,0.3)'"
+          onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 30px rgba(124,58,237,0.2)'">
+          <div
+            style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.08);">
+          </div>
+          <div
+            style="position: absolute; bottom: -30px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05);">
+          </div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div style="position: relative; z-index: 1;">
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                Total Revenue</p>
+              <h3
+                style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 26px; color: #ffffff; margin: 0; letter-spacing: -0.5px;">
+                ₹{{ total_revenue|floatformat:2 }}</h3>
+            </div>
+            <div
+              style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-indian-rupee-sign" style="color: #fff; font-size: 20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Bookings -->
+      <div class="col-xl col-md-6 mb-4 d-flex">
+        <div
+          style="background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); border-radius: 20px; padding: 28px 24px; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(59,130,246,0.2); transition: all 0.3s ease; cursor: default; width: 100%; min-height: 140px;"
+          class="metric-card"
+          onmouseenter="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 14px 40px rgba(59,130,246,0.3)'"
+          onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 30px rgba(59,130,246,0.2)'">
+          <div
+            style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.08);">
+          </div>
+          <div
+            style="position: absolute; bottom: -30px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05);">
+          </div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div style="position: relative; z-index: 1;">
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                Total Bookings</p>
+              <h3
+                style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 26px; color: #ffffff; margin: 0; letter-spacing: -0.5px;">
+                {{ total_bookings }}</h3>
+            </div>
+            <div
+              style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-calendar-check" style="color: #fff; font-size: 20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Today's Bookings -->
+      <div class="col-xl col-md-6 mb-4 d-flex">
+        <div
+          style="background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); border-radius: 20px; padding: 28px 24px; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(245,158,11,0.2); transition: all 0.3s ease; cursor: default; width: 100%; min-height: 140px;"
+          class="metric-card"
+          onmouseenter="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 14px 40px rgba(245,158,11,0.3)'"
+          onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 30px rgba(245,158,11,0.2)'">
+          <div
+            style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.08);">
+          </div>
+          <div
+            style="position: absolute; bottom: -30px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05);">
+          </div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div style="position: relative; z-index: 1;">
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                Today's Bookings</p>
+              <h3
+                style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 26px; color: #ffffff; margin: 0; letter-spacing: -0.5px;">
+                {{ today_bookings }}</h3>
+            </div>
+            <div
+              style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-clock" style="color: #fff; font-size: 20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Customers -->
+      <div class="col-xl col-md-6 mb-4 d-flex">
+        <div
+          style="background: linear-gradient(135deg, #10b981 0%, #34d399 100%); border-radius: 20px; padding: 28px 24px; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(16,185,129,0.2); transition: all 0.3s ease; cursor: default; width: 100%; min-height: 140px;"
+          class="metric-card"
+          onmouseenter="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 14px 40px rgba(16,185,129,0.3)'"
+          onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 30px rgba(16,185,129,0.2)'">
+          <div
+            style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.08);">
+          </div>
+          <div
+            style="position: absolute; bottom: -30px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05);">
+          </div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div style="position: relative; z-index: 1;">
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                Active Customers</p>
+              <h3
+                style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 26px; color: #ffffff; margin: 0; letter-spacing: -0.5px;">
+                {{ active_users }}</h3>
+            </div>
+            <div
+              style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-user-check" style="color: #fff; font-size: 20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Active Vendors -->
+      <div class="col-xl col-md-6 mb-4 d-flex">
+        <div
+          style="background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%); border-radius: 20px; padding: 28px 24px; position: relative; overflow: hidden; box-shadow: 0 8px 30px rgba(236,72,153,0.2); transition: all 0.3s ease; cursor: default; width: 100%; min-height: 140px;"
+          class="metric-card"
+          onmouseenter="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 14px 40px rgba(236,72,153,0.3)'"
+          onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 30px rgba(236,72,153,0.2)'">
+          <div
+            style="position: absolute; top: -20px; right: -20px; width: 100px; height: 100px; border-radius: 50%; background: rgba(255,255,255,0.08);">
+          </div>
+          <div
+            style="position: absolute; bottom: -30px; right: 20px; width: 70px; height: 70px; border-radius: 50%; background: rgba(255,255,255,0.05);">
+          </div>
+          <div class="d-flex justify-content-between align-items-start">
+            <div style="position: relative; z-index: 1;">
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">
+                Active Vendors</p>
+              <h3
+                style="font-family: 'Poppins', sans-serif; font-weight: 800; font-size: 26px; color: #ffffff; margin: 0; letter-spacing: -0.5px;">
+                {{ active_vendors }}</h3>
+            </div>
+            <div
+              style="width: 48px; height: 48px; border-radius: 14px; background: rgba(255,255,255,0.18); display: flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-store" style="color: #fff; font-size: 20px;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-4">
+      <!-- Sales Overview Chart -->
+      <div class="col-lg-7 mb-4">
+        <div
+          style="background: #ffffff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.04); transition: all 0.3s ease;"
+          onmouseenter="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.08)'"
+          onmouseleave="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.04)'">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5
+                style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #1e1b4b; margin-bottom: 4px;">
+                <i class="fa-solid fa-chart-line" style="color: #7c3aed; margin-right: 8px;"></i>Sales Overview
+              </h5>
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12.5px; color: #94a3b8; font-weight: 500; margin: 0;">
+                Monthly revenue trends for the current year</p>
+            </div>
+            <div style="padding: 6px 14px; background: rgba(124,58,237,0.08); border-radius: 20px;">
+              <span
+                style="font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 600; color: #7c3aed; letter-spacing: 0.3px;">
+                <i class="fa-solid fa-circle"
+                  style="font-size: 6px; vertical-align: middle; margin-right: 5px;"></i>LIVE
+              </span>
+            </div>
+          </div>
+          <canvas id="sales-chart" height="160"></canvas>
+        </div>
+      </div>
+
+      <!-- Order Status Chart -->
+      <div class="col-lg-5 mb-4">
+        <div
+          style="background: #ffffff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.04); transition: all 0.3s ease;"
+          onmouseenter="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.08)'"
+          onmouseleave="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.04)'">
+          <div class="mb-3">
+            <h5
+              style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #1e1b4b; margin-bottom: 4px;">
+              <i class="fa-solid fa-chart-pie" style="color: #3b82f6; margin-right: 8px;"></i>Order Status
+            </h5>
+            <p
+              style="font-family: 'Poppins', sans-serif; font-size: 12.5px; color: #94a3b8; font-weight: 500; margin: 0;">
+              Distribution of order statuses</p>
+          </div>
+          <canvas id="order-status-chart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Report Table -->
+    <div class="row">
+      <div class="col-12">
+        <div
+          style="background: #ffffff; border-radius: 20px; padding: 28px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.04); transition: all 0.3s ease;"
+          onmouseenter="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.08)'"
+          onmouseleave="this.style.boxShadow='0 4px 20px rgba(0,0,0,0.04)'">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+              <h5
+                style="font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 17px; color: #1e1b4b; margin-bottom: 4px;">
+                <i class="fa-solid fa-receipt" style="color: #7c3aed; margin-right: 8px;"></i>Recent Sales Report
+              </h5>
+              <p
+                style="font-family: 'Poppins', sans-serif; font-size: 12.5px; color: #94a3b8; font-weight: 500; margin: 0;">
+                Latest 20 orders across the platform</p>
+            </div>
+            <a href="{% url 'admin_sales_report' %}"
+              style="font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #7c3aed, #8b5cf6); color: #fff; padding: 8px 18px; border-radius: 10px; font-size: 12px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 12px rgba(124,58,237,0.2); transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 6px;"
+              onmouseenter="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(124,58,237,0.3)'"
+              onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(124,58,237,0.2)'">
+              <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 10px;"></i> View Full Report
+            </a>
+          </div>
+          <div class="table-responsive"
+            style="border-radius: 14px; overflow: hidden; border: 1px solid rgba(0,0,0,0.04);">
+            <table style="width: 100%; border-collapse: collapse; font-family: 'Poppins', sans-serif;">
+              <thead>
+                <tr style="background: linear-gradient(135deg, #f8f7ff 0%, #f1f0ff 100%);">
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Order ID</th>
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Customer</th>
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Date</th>
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: left; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Status</th>
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Total Rent</th>
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Deposit</th>
+                  <th
+                    style="padding: 14px 18px; font-size: 11px; font-weight: 700; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.8px; text-align: right; border-bottom: 2px solid rgba(124,58,237,0.1);">
+                    Grand Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                <tr style="transition: background 0.2s ease; border-bottom: 1px solid rgba(0,0,0,0.03);"
+                  onmouseenter="this.style.background='rgba(124,58,237,0.03)'"
+                  onmouseleave="this.style.background='transparent'">
+                  <td style="padding: 14px 18px; font-size: 13px; font-weight: 600; color: #1e1b4b;">{{ order.order_number }}</td>
+                  <td style="padding: 14px 18px; font-size: 13px; font-weight: 500; color: #475569;">{{ order.customer.name }}</td>
+                  <td style="padding: 14px 18px; font-size: 13px; font-weight: 500; color: #64748b;">{{ order.created_at|date:"M d, Y" }}</td>
+                  <td style="padding: 14px 18px;">
+                    {% if order.status == 'completed' or order.status == 'returned' %}
+                    <span
+                      style="background: rgba(16,185,129,0.1); color: #10b981; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;">{{ order.get_status_display }}</span>
+                    {% elif order.status == 'pending' %}
+                    <span
+                      style="background: rgba(245,158,11,0.1); color: #f59e0b; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;">{{ order.get_status_display }}</span>
+                    {% elif order.status == 'cancelled' %}
+                    <span
+                      style="background: rgba(239,68,68,0.1); color: #ef4444; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;">{{ order.get_status_display }}</span>
+                    {% else %}
+                    <span
+                      style="background: rgba(59,130,246,0.1); color: #3b82f6; padding: 5px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px;">{{ order.get_status_display }}</span>
+                    {% endif %}
+                  </td>
+                  <td style="padding: 14px 18px; font-size: 13px; font-weight: 600; color: #1e1b4b; text-align: right;">
+                    ₹{{ order.total_rent }}</td>
+                  <td style="padding: 14px 18px; font-size: 13px; font-weight: 500; color: #64748b; text-align: right;">
+                    ₹{{ order.total_security_deposit }}</td>
+                  <td style="padding: 14px 18px; font-size: 13px; font-weight: 700; color: #7c3aed; text-align: right;">
+                    ₹{{ order.grand_total }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                  <td colspan="7"
+                    style="padding: 40px 18px; text-align: center; font-family: 'Poppins', sans-serif; font-size: 14px; color: #94a3b8; font-weight: 500;">
+                    <i class="fa-solid fa-inbox"
+                      style="font-size: 32px; color: #cbd5e1; display: block; margin-bottom: 12px;"></i>
+                    No orders found
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% include "Admin/footer.html" %}
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{ sales_dates|json_script:"sales-dates-data" }}
+    {{ sales_amounts|json_script:"sales-amounts-data" }}
+    {{ status_labels|json_script:"status-labels-data" }}
+    {{ status_data|json_script:"status-data-data" }}
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const salesDates = JSON.parse(document.getElementById('sales-dates-data').textContent);
+        const salesAmounts = JSON.parse(document.getElementById('sales-amounts-data').textContent);
+        const statusLabels = JSON.parse(document.getElementById('status-labels-data').textContent);
+        const statusData = JSON.parse(document.getElementById('status-data-data').textContent);
+
+        if (document.getElementById('sales-chart')) {
+          var salesChartCanvas = document.getElementById('sales-chart').getContext('2d');
+
+          // Create gradient for the chart
+          var gradient = salesChartCanvas.createLinearGradient(0, 0, 0, 300);
+          gradient.addColorStop(0, 'rgba(124, 58, 237, 0.25)');
+          gradient.addColorStop(1, 'rgba(124, 58, 237, 0.01)');
+
+          var salesChart = new Chart(salesChartCanvas, {
+            type: 'line',
+            data: {
+              labels: salesDates,
+              datasets: [{
+                label: 'Revenue (₹)',
+                data: salesAmounts,
+                borderColor: '#7c3aed',
+                backgroundColor: gradient,
+                fill: true,
+                tension: 0.4,
+                borderWidth: 2.5,
+                pointBackgroundColor: '#7c3aed',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4,
+                pointHoverRadius: 7,
+                pointHoverBackgroundColor: '#7c3aed',
+                pointHoverBorderColor: '#ffffff',
+                pointHoverBorderWidth: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  backgroundColor: '#1e1b4b',
+                  titleFont: { family: 'Poppins', weight: '600' },
+                  bodyFont: { family: 'Poppins' },
+                  padding: 12,
+                  cornerRadius: 10,
+                  displayColors: false
+                }
+              },
+              scales: {
+                y: {
+                  beginAtZero: true,
+                  grid: { color: 'rgba(0,0,0,0.04)', drawBorder: false },
+                  ticks: { font: { family: 'Poppins', size: 11 }, color: '#94a3b8' }
+                },
+                x: {
+                  grid: { display: false },
+                  ticks: { font: { family: 'Poppins', size: 11 }, color: '#94a3b8' }
+                }
+              }
+            }
+          });
+        }
+
+        if (document.getElementById('order-status-chart')) {
+          var statusChartCanvas = document.getElementById('order-status-chart').getContext('2d');
+          var statusChart = new Chart(statusChartCanvas, {
+            type: 'doughnut',
+            data: {
+              labels: statusLabels,
+              datasets: [{
+                data: statusData,
+                backgroundColor: [
+                  '#7c3aed',
+                  '#3b82f6',
+                  '#f59e0b',
+                  '#ef4444',
+                  '#10b981'
+                ],
+                borderWidth: 0,
+                hoverOffset: 8,
+                spacing: 3
+              }]
+            },
+            options: {
+              responsive: true,
+              cutout: '65%',
+              plugins: {
+                legend: {
+                  position: 'bottom',
+                  labels: {
+                    font: { family: 'Poppins', size: 12, weight: '500' },
+                    color: '#475569',
+                    padding: 16,
+                    usePointStyle: true,
+                    pointStyleWidth: 12
+                  }
+                },
+                tooltip: {
+                  backgroundColor: '#1e1b4b',
+                  titleFont: { family: 'Poppins', weight: '600' },
+                  bodyFont: { family: 'Poppins' },
+                  padding: 12,
+                  cornerRadius: 10
+                }
+              }
+            }
+          });
+        }
+      });
+    </script>
+    <!-- content-wrapper ends -->
+    <!-- partial:partials/_footer.html -->

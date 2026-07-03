@@ -1,0 +1,574 @@
+{% load static %}
+{% include "Vendor/header.html" %}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary: var(--vendor-secondary);
+        --primary-dark: #0b5ed7;
+        --secondary: var(--vendor-primary);
+        --success: #198754;
+        --danger: #dc3545;
+        --light-bg: #f8f9fa;
+        --border-color: #e9ecef;
+        --text-dark: var(--vendor-primary);
+        --text-light: #6c757d;
+        --shadow-sm: 0 4px 12px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 16px rgba(0,0,0,0.12);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.16);
+        --radius: 12px;
+    }
+
+    body {
+        background: var(--vendor-bg) !important;
+        min-height: 100vh;
+        color: var(--text-dark);
+        font-family: 'Poppins', sans-serif;
+    } 
+    
+    .form-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--secondary);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .form-header h1 i {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        color: white;
+        padding: 12px 20px;
+        border-radius: 50%;
+        font-size: 1.8rem;
+    }
+
+    .form-header p {
+        color: var(--text-light);
+        font-size: 1.1rem;
+        margin: 0;
+        text-align: center;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        overflow: hidden;
+        max-width: 900px;
+        margin: 40px auto;
+        animation: slideUp 0.6s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .form-banner {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        color: white;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .form-banner::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+    }
+
+    .form-banner h2 {
+        position: relative;
+        z-index: 1;
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+
+    .form-banner p {
+        position: relative;
+        z-index: 1;
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+        font-size: 0.95rem;
+    }
+
+    .form-body {
+        padding: 45px;
+    }
+
+    .form-section {
+        margin-bottom: 45px;
+        padding-bottom: 40px;
+        border-bottom: 2px solid var(--light-bg);
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid var(--primary);
+    }
+
+    .section-header i {
+        font-size: 1.5rem;
+        color: var(--primary);
+        background: rgba(65, 84, 241, 0.1);
+        width: 45px;
+        height: 45px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+    }
+
+    .section-header h3 {
+        margin: 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--secondary);
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: var(--text-dark);
+        font-size: 0.95rem;
+    }
+
+    .form-label .required {
+        color: var(--danger);
+        margin-left: 4px;
+    }
+
+    .form-label .hint {
+        display: block;
+        font-weight: 400;
+        color: var(--text-light);
+        font-size: 0.85rem;
+        margin-top: 4px;
+    }
+
+    .form-control, 
+    .form-select, 
+    textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: white;
+        color: var(--text-dark);
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-control:focus, 
+    .form-select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(65, 84, 241, 0.1);
+        background-color: #fafbff;
+    }
+
+    textarea {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .row-2col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+    }
+    
+    .row-3col {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 25px;
+    }
+
+    @media (max-width: 768px) {
+        .row-2col, .row-3col {
+            grid-template-columns: 1fr;
+        }
+        .form-body {
+            padding: 30px;
+        }
+    }
+
+    .image-upload-box {
+        border: 3px dashed var(--border-color);
+        border-radius: var(--radius);
+        padding: 40px 30px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: #fafbff;
+    }
+
+    .image-upload-box:hover {
+        border-color: var(--primary);
+        background-color: rgba(65, 84, 241, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .image-upload-box i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    .image-preview {
+        margin-top: 20px;
+    }
+    
+    .preview-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .image-preview img {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-md);
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(65, 84, 241, 0.4);
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(65, 84, 241, 0.5);
+    }
+    
+    .btn-cancel {
+        background: #e9ecef;
+        color: var(--text-dark);
+        border: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .btn-cancel:hover {
+        background: #dee2e6;
+        color: var(--text-dark);
+    }
+    
+    .form-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 40px;
+    }
+
+</style>
+
+<div class="container-fluid" style="padding: 40px 0;">
+    <div class="form-card">
+        <!-- Banner -->
+        <div class="form-banner">
+            <h2><i class="fas fa-edit me-2"></i> Edit Product</h2>
+            <p>Update details for {{ product.product_name }}</p>
+        </div>
+
+        <div class="form-body">
+            <!-- Messages -->
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Section 1: Basic Info -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-tags"></i>
+                        <h3>Product Details</h3>
+                    </div>
+                    
+                    <div class="row-2col">
+                         <!-- Read-only Category -->
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <input type="text" class="form-control" value="{{ product.category.category_name }}" disabled style="background-color: #f8f9fa;">
+                            <span class="form-label mb-0 mt-1" style="font-size: 0.8rem; font-weight: normal; color: var(--text-light);"><i class="fas fa-lock me-1"></i>Cannot change category</span>
+                        </div>
+                        
+                        <!-- Read-only Subcategory -->
+                        <div class="form-group">
+                            <label class="form-label">Sub-Category</label>
+                            <input type="text" class="form-control" value="{{ product.subcategory.subcategory_name }}" disabled style="background-color: #f8f9fa;">
+                             <span class="form-label mb-0 mt-1" style="font-size: 0.8rem; font-weight: normal; color: var(--text-light);"><i class="fas fa-lock me-1"></i>Cannot change subcategory</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product_name" class="form-label">Product Name <span class="required">*</span></label>
+                        <input type="text" name="product_name" id="product_name" class="form-control" 
+                               value="{{ product.product_name }}" required placeholder="e.g. Wooden Dining Table">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="brand" class="form-label">Brand <span class="hint">(Optional)</span></label>
+                        <input type="text" name="brand" id="brand" class="form-control" 
+                               value="{{ product.brand|default:'' }}" placeholder="e.g. IKEA">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="product_description" class="form-label">Description <span class="required">*</span></label>
+                        <textarea name="product_description" id="product_description" class="form-control" 
+                                  placeholder="Describe your product...">{{ product.product_description }}</textarea>
+                    </div>
+                </div>
+
+                <!-- Section 2: Image -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-image"></i>
+                        <h3>Product Image</h3>
+                    </div>
+
+                    <div class="row">
+                         <div class="col-md-6">
+                            {% if product.product_image %}
+                                <div class="form-group">
+                                    <label class="form-label">Current Image</label>
+                                    <div class="image-preview" style="display: block; margin-top: 0;">
+                                        <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}">
+                                    </div>
+                                </div>
+                            {% endif %}
+                         </div>
+                         <div class="col-md-6">
+                            <label class="form-label">Upload New Image <span class="hint">(Leave empty to keep current)</span></label>
+                            <div class="image-upload-box" onclick="document.getElementById('product_image').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>Click to Upload</h4>
+                                <p>Support: JPEG, PNG, WEBP</p>
+                            </div>
+                            <input type="file" name="product_image" id="product_image" class="d-none" onchange="previewImage(event)">
+                            
+                            <div class="image-preview" id="newImagePreview" style="display: none;">
+                                <label class="form-label mt-3">New Image Preview:</label>
+                                <img id="preview" src="" alt="Preview">
+                            </div>
+                         </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Pricing & Stock -->
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-rupee-sign"></i>
+                        <h3>Pricing & Inventory</h3>
+                    </div>
+
+                    <div class="row-3col">
+                        <div class="form-group">
+                            <label for="rent_price_per_day" class="form-label">Daily Rent (₹)</label>
+                            <input type="number" name="rent_price_per_day" id="rent_price_per_day" class="form-control" 
+                                   value="{{ product.rent_price_per_day|default:'' }}" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="rent_price_per_month" class="form-label">Monthly Rent (₹)</label>
+                            <input type="number" name="rent_price_per_month" id="rent_price_per_month" class="form-control" 
+                                   value="{{ product.rent_price_per_month|default:'' }}" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="security_deposit" class="form-label">Security Deposit (₹)</label>
+                            <input type="number" name="security_deposit" id="security_deposit" class="form-control" 
+                                   value="{{ product.security_deposit|default:'' }}" step="0.01" min="0">
+                        </div>
+                    </div>
+                    
+                    <div class="row-2col">
+                         <div class="form-group">
+                            <label for="stock_quantity" class="form-label">Stock Quantity <span class="required">*</span></label>
+                            <input type="number" name="stock_quantity" id="stock_quantity" class="form-control" 
+                                   value="{{ product.stock_quantity }}" required min="0">
+                         </div>
+                         
+                         <div class="form-group">
+                            <label class="form-label">Availability</label>
+                            <div class="form-check p-3 border rounded">
+                                <input class="form-check-input ms-0 me-2" type="checkbox" name="is_available" id="is_available" 
+                                       {% if product.is_available %}checked{% endif %} style="float: none;">
+                                <label class="form-check-label fw-bold" for="is_available">
+                                    Available for Rent
+                                </label>
+                            </div>
+                         </div>
+                    </div>
+                </div>
+                
+                <!-- Section 4: Specifications (Dynamic) -->
+                {% if product.category.category_name|lower == 'furniture' and furniture_details %}
+                <div class="form-section">
+                    <div class="section-header">
+                        <i class="fas fa-couch"></i>
+                        <h3>Furniture Specifications</h3>
+                    </div>
+                    
+                    <div class="row-2col">
+                         <div class="form-group">
+                            <label for="furniture_type" class="form-label">Type <span class="required">*</span></label>
+                            <input type="text" name="furniture_type" id="furniture_type" class="form-control" 
+                                   value="{{ furniture_details.furniture_type|default:'' }}">
+                         </div>
+                         <div class="form-group">
+                            <label for="furniture_size" class="form-label">Size <span class="required">*</span></label>
+                            <input type="text" name="furniture_size" id="furniture_size" class="form-control" 
+                                   value="{{ furniture_details.size|default:'' }}">
+                         </div>
+                    </div>
+                    
+                    <div class="row-2col">
+                         <div class="form-group">
+                            <label for="furniture_material" class="form-label">Material <span class="required">*</span></label>
+                            <input type="text" name="furniture_material" id="furniture_material" class="form-control" 
+                                   value="{{ furniture_details.material|default:'' }}">
+                         </div>
+                         <div class="form-group">
+                            <label for="furniture_thickness" class="form-label">Thickness</label>
+                            <input type="text" name="furniture_thickness" id="furniture_thickness" class="form-control" 
+                                   value="{{ furniture_details.thickness|default:'' }}">
+                         </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="furniture_features" class="form-label">Extra Features</label>
+                        <textarea name="furniture_features" id="furniture_features" class="form-control" 
+                                  placeholder="e.g. Cushioned..." style="min-height: 80px;">{{ furniture_details.extra_features|default:'' }}</textarea>
+                    </div>
+                </div>
+                {% elif product.category.category_name|lower == 'appliances' and appliance_details %}
+                <div class="form-section">
+                    <div class="section-header">
+                         <i class="fas fa-plug"></i>
+                        <h3>Appliance Specifications</h3>
+                    </div>
+                    
+                    <div class="row-2col">
+                        <div class="form-group">
+                            <label for="appliance_type" class="form-label">Type <span class="required">*</span></label>
+                            <input type="text" name="appliance_type" id="appliance_type" class="form-control" 
+                                   value="{{ appliance_details.operation_type|default:'' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="appliance_power_rating" class="form-label">Power Rating <span class="required">*</span></label>
+                            <input type="text" name="appliance_power_rating" id="appliance_power_rating" class="form-control" 
+                                   value="{{ appliance_details.power_rating|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row-2col">
+                        <div class="form-group">
+                            <label for="appliance_voltage" class="form-label">Voltage <span class="required">*</span></label>
+                            <input type="text" name="appliance_voltage" id="appliance_voltage" class="form-control" 
+                                   value="{{ appliance_details.voltage|default:'' }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="appliance_warranty" class="form-label">Warranty Period</label>
+                            <input type="text" name="appliance_warranty" id="appliance_warranty" class="form-control" 
+                                   value="{{ appliance_details.warranty_period|default:'' }}">
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Actions -->
+                <div class="form-actions">
+                    <button type="submit" class="btn-submit">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{% url 'vendor_products' %}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+{% include "Vendor/footer.html" %}
+
+<script src="{% static 'vendor/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+<script>
+    function previewImage(event) {
+        var input = event.target;
+        var preview = document.getElementById('preview');
+        var previewContainer = document.getElementById('newImagePreview');
+        
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                previewContainer.style.display = 'block';
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

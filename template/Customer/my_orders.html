@@ -1,0 +1,170 @@
+{% extends 'customer/base.html' %}
+{% load static %}
+
+{% block title %}My Orders - Urban Rentals{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="margin-top: 80px;">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Page Header -->
+            <div class="mb-4">
+                <h1 class="mb-2">My Orders</h1>
+                <p class="text-muted">Track and manage your rental orders</p>
+            </div>
+
+            <!-- Messages -->
+            {% if messages %}
+                <div class="alert-container mb-4">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Orders List -->
+            {% if orders %}
+                <div class="row g-3">
+                    {% for order in orders %}
+                        <div class="col-12">
+                            <div class="card border-0 shadow-sm rounded-3">
+                                <div class="card-body p-4">
+                                    <div class="row align-items-center">
+                                        <!-- Order Info -->
+                                        <div class="col-md-6">
+                                            <h6 class="mb-2">Order #<strong>{{ order.order_number }}</strong></h6>
+                                            
+                                            <!-- Product Names -->
+                                            <p class="mb-2 fw-bold text-dark">
+                                                {% for item in order.items.all|slice:":3" %}
+                                                    {{ item.product.product_name }}{% if not forloop.last %}, {% endif %}
+                                                {% endfor %}
+                                                {% if order.items.count > 3 %}
+                                                    <span class="text-muted small">+{{ order.items.count|add:"-3" }} more</span>
+                                                {% endif %}
+                                            </p>
+
+                                            <p class="text-muted small mb-1">
+                                                <i class="bi bi-calendar"></i> {{ order.created_at|date:"M d, Y H:i" }}
+                                            </p>
+                                            <p class="text-muted small mb-0">
+                                                <i class="bi bi-basket"></i> {{ order.items.count }} item(s)
+                                            </p>
+                                        </div>
+
+                                        <!-- Status and Amount -->
+                                        <div class="col-md-3 text-md-center">
+                                            <div class="mb-2">
+                                                {% if order.has_completed_return %}
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="bi bi-arrow-counterclockwise me-1"></i>Return Completed
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge 
+                                                        {% if order.status == 'pending' %}bg-warning text-dark
+                                                        {% elif order.status == 'confirmed' %}bg-info text-white
+                                                        {% elif order.status == 'paid' %}bg-success text-white
+                                                        {% elif order.status == 'delivered' %}bg-success text-white
+                                                        {% elif order.status == 'completed' %}bg-success text-white
+                                                        {% else %}bg-danger text-white{% endif %}">
+                                                        {{ order.get_status_display }}
+                                                    </span>
+                                                {% endif %}
+                                            </div>
+                                            <h6 class="mb-0">₹{{ order.grand_total }}</h6>
+                                            <small class="text-muted">Grand Total</small>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="col-md-3 text-md-end">
+                                            <div class="d-flex flex-column gap-2">
+                                                <a href="{% url 'track_order' order.order_id %}" class="btn btn-sm btn-outline-info">
+                                                     <i class="bi bi-truck"></i> Track
+                                                </a>
+                                                <a href="{% url 'order_confirmation' order.order_id %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="bi bi-eye"></i> View Details
+                                                </a>
+
+                                                {% if order.status == 'delivered' or order.status == 'completed' %}
+                                                    {% with first_item=order.items.first %}
+                                                        {% if order.items.count == 1 and first_item.product %}
+                                                            <a href="{% url 'add_review' first_item.product.product_id %}" class="btn btn-sm btn-outline-warning">
+                                                                <i class="bi bi-star"></i> Write Review
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="{% url 'order_confirmation' order.order_id %}" class="btn btn-sm btn-outline-warning">
+                                                                <i class="bi bi-star"></i> Product Reviews
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endwith %}
+                                                {% endif %}
+                                                
+                                                {% if order.status == 'confirmed' %}
+                                                    <a href="{% url 'payment_page' order.order_id %}" class="btn btn-sm btn-outline-success">
+                                                        <i class="bi bi-credit-card"></i> Pay Now
+                                                    </a>
+                                                {% elif order.status == 'delivered' or order.status == 'completed' %}
+                                                    <a href="{% url 'return_product' order.order_id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Do you want to initiate a return for this order?');">
+                                                        <i class="bi bi-arrow-counterclockwise"></i> Return
+                                                    </a>
+                                                {% elif order.status == 'cancelled' %}
+                                                    <span class="badge bg-danger">Cancelled</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status Timeline (Mini) -->
+                                    <div class="mt-3 pt-3 border-top">
+                                        <div class="row text-center small">
+                                            <div class="col-3">
+                                                <i class="bi bi-hourglass-split {% if order.status != 'cancelled' %}text-success{% endif %}"></i><br>
+                                                <small>Placed</small>
+                                            </div>
+                                            <div class="col-3">
+                                                <i class="bi bi-check-circle {% if order.status in 'confirmed,paid,delivered,completed,return_requested' %}text-success{% endif %}"></i><br>
+                                                <small>Confirmed</small>
+                                            </div>
+                                            <div class="col-3">
+                                                <i class="bi bi-credit-card {% if order.status in 'paid,delivered,completed,return_requested' %}text-success{% endif %}"></i><br>
+                                                <small>Payment</small>
+                                            </div>
+                                            <div class="col-3">
+                                                <i class="bi bi-truck {% if order.status in 'delivered,completed,return_requested' %}text-success{% endif %}"></i><br>
+                                                <small>Delivered</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info rounded-3" role="alert">
+                    <h5 class="alert-heading">No Orders Yet</h5>
+                    <p class="mb-0">You haven't placed any orders yet. Start browsing our collection to rent amazing products!</p>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="{% url 'browse_products' %}" class="btn btn-primary btn-lg rounded-3">
+                        <i class="bi bi-shop"></i> Browse Products
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15) !important;
+    }
+</style>
+{% endblock %}

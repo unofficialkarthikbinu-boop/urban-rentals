@@ -1,0 +1,214 @@
+{% load static %}
+{% include "Customer/header.html" %}
+
+<main class="pt-5">
+  <div class="container py-5">
+    <!-- Page Header -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'customer_home' %}">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Shopping Cart</li>
+      </ol>
+    </nav>
+
+    {% if messages %}
+      <div class="alert-container mb-4">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if cart_items %}
+      <div class="row g-4">
+        <!-- Cart Items -->
+        <div class="col-lg-8">
+          <div class="cart-items">
+            <h3 class="display-6 fw-bold mb-4">Shopping Cart ({{ cart_items|length }} items)</h3>
+            
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Product</th>
+                    <th>Rent Type</th>
+                    <th>Duration</th>
+                    <th>Dates</th>
+                    <th>Qty</th>
+                    <th>Price/Unit</th>
+                    <th>Total Rent</th>
+                    <th>Security</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for item in cart_items %}
+                    <tr class="align-middle">
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          {% if item.product.product_image %}
+                            <img src="{{ item.product.product_image.url }}" alt="{{ item.product.product_name }}" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.5rem;">
+                          {% else %}
+                            <img src="https://via.placeholder.com/60x60?text=No+Image" alt="No image" 
+                                 style="width: 60px; height: 60px; object-fit: cover; border-radius: 0.5rem;">
+                          {% endif %}
+                          <div>
+                            <h6 class="mb-0">
+                              <a href="{% url 'product_detail' item.product.product_id %}" class="text-decoration-none text-dark">
+                                {{ item.product.product_name|truncatewords:5 }}
+                              </a>
+                            </h6>
+                            <small class="text-muted">Vendor: {{ item.product.vendor.shop_name|default:item.product.vendor.name }}</small>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <span class="badge bg-info text-dark">
+                          {% if item.rent_type == 'daily' %}Daily{% else %}Monthly{% endif %}
+                        </span>
+                      </td>
+                      <td>
+                        <span>{{ item.rental_duration }} {% if item.rent_type == 'daily' %}days{% else %}months{% endif %}</span>
+                      </td>
+                      <td>
+                        <small class="text-muted d-block">Start: {{ item.rental_start_date|date:"d M Y" }}</small>
+                        <small class="text-muted d-block">End: {{ item.rental_end_date|date:"d M Y" }}</small>
+                      </td>
+                      <td>{{ item.quantity }}</td>
+                      <td>₹{{ item.rent_price }}</td>
+                      <td><strong>₹{{ item.total_rent }}</strong></td>
+                      <td>₹{{ item.security_deposit }}</td>
+                      <td>
+                        <form method="POST" action="{% url 'remove_from_cart' item.cart_id %}" style="display:inline;">
+                          {% csrf_token %}
+                          <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove this item?');">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M19 6.4L17.6 5 12 10.6 6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12z"/>
+                            </svg>
+                          </button>
+                        </form>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <a href="{% url 'browse_products' %}" class="btn btn-outline-primary btn-md rounded-3 mt-3">
+              ← Continue Shopping
+            </a>
+          </div>
+        </div>
+
+        <!-- Cart Summary -->
+        <div class="col-lg-4">
+          <div class="cart-summary bg-light p-4 rounded-3 sticky-top" style="top: 100px;">
+            <h5 class="fw-bold mb-4">Order Summary</h5>
+
+            <div class="summary-item d-flex justify-content-between mb-3">
+              <span>Rental Charges:</span>
+              <span>₹{{ subtotal }}</span>
+            </div>
+
+            <div class="summary-item d-flex justify-content-between mb-3">
+              <span>Security Deposit:</span>
+              <span>₹{{ total_security }}</span>
+            </div>
+
+            <div class="summary-item d-flex justify-content-between mb-4 border-top pt-3">
+              <h6 class="fw-bold mb-0">Grand Total:</h6>
+              <h6 class="fw-bold mb-0 text-primary">₹{{ grand_total }}</h6>
+            </div>
+
+            <a href="{% url 'delivery_details' %}" class="btn btn-primary btn-lg w-100 rounded-3 mb-2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="me-2">
+                <path d="M20 8h-1V7c0-.6-.4-1-1-1H6c-.6 0-1 .4-1 1v1H4c-1.1 0-1.99.9-1.99 2L2 19c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 11H4V10h16v9zm-11-7h2v5h-2z"/>
+              </svg>
+              Proceed to Checkout
+            </a>
+
+            
+
+            <a href="{% url 'browse_products' %}" class="btn btn-outline-secondary btn-sm w-100 rounded-3 mb-3">
+              Continue Shopping
+            </a>
+
+            <div class="mt-4 pt-4 border-top">
+              <p class="small text-muted mb-2">
+                <strong>Note:</strong> Security deposit will be refunded after the rental period ends and product is returned in good condition.
+              </p>
+            </div>
+
+            <div class="alert alert-info small mt-3 rounded-3" role="alert">
+              <strong>Delivery Available:</strong> Complimentary delivery on orders above ₹500
+            </div>
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <!-- Empty Cart -->
+      <div class="row">
+        <div class="col-md-8 mx-auto">
+          <div class="empty-cart text-center py-5">
+            <svg width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-4 text-muted">
+              <circle cx="9" cy="21" r="1"/>
+              <circle cx="20" cy="21" r="1"/>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <h3 class="display-6 fw-bold mb-3">Your Cart is Empty</h3>
+            <p class="text-muted mb-4">Start browsing and add items to your cart!</p>
+            <a href="{% url 'browse_products' %}" class="btn btn-primary btn-lg rounded-3">
+              Browse Products
+            </a>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</main>
+
+{% include "Customer/footer.html" %}
+
+<style>
+  .breadcrumb {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .breadcrumb-item a {
+    text-decoration: none;
+    color: #0d6efd;
+  }
+
+  .breadcrumb-item a:hover {
+    text-decoration: underline;
+  }
+
+  .cart-summary {
+    border: 2px solid #e9ecef;
+  }
+
+  .summary-item {
+    font-size: 0.95rem;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f8f9fa;
+  }
+
+  .empty-cart {
+    padding: 60px 20px;
+  }
+
+  @media (max-width: 768px) {
+    .cart-summary {
+      position: static !important;
+      margin-top: 2rem;
+    }
+  }
+</style>

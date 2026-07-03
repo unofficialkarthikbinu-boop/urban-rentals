@@ -1,0 +1,58 @@
+{% load static %}
+{% include "Customer/header.html" %}
+
+<main id="main" class="main" style="padding-top: 100px; min-height: 80vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card shadow-lg border-0 rounded-4">
+                    <div class="card-header bg-white text-dark py-4 px-4 border-bottom-0">
+                        <h4 class="mb-0 fw-bold">My Conversations</h4>
+                        <p class="text-muted small mb-0">Chat with vendors for support & inquiries</p>
+                    </div>
+
+                    <div class="list-group list-group-flush rounded-bottom-4">
+                        {% for chat in chats %}
+                            <a href="{% url 'chat_room' chat.id %}" class="list-group-item list-group-item-action d-flex align-items-center py-3 px-4 border-0 border-bottom hover-lift">
+                                <div class="rounded-circle bg-light text-primary d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-shop h4 mb-0"></i> 
+                                </div>
+                                <div class="flex-grow-1 min-width-0">
+                                    <div class="d-flex w-100 justify-content-between align-items-center mb-1">
+                                        <h6 class="mb-0 fw-bold text-truncate">{{ chat.vendor.name }}</h6>
+                                        <small class="text-muted" style="font-size: 0.75rem;">{{ chat.updated_at|date:"M d, H:i" }}</small>
+                                    </div>
+                                    <p class="mb-0 text-muted small text-truncate" style="max-width: 250px;">
+                                        Click to view conversation...
+                                    </p>
+                                </div>
+                                <i class="bi bi-chevron-right text-muted ms-3"></i>
+                            </a>
+                        {% empty %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-chat-square-dots display-1 text-muted opacity-25 mb-3"></i>
+                                <h5 class="text-muted">No conversations yet</h5>
+                                <p class="text-muted small">Start chatting from a product page!</p>
+                                <a href="{% url 'browse_products' %}" class="btn btn-primary rounded-pill mt-3 px-4">Browse Products</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+{% include "Customer/footer.html" %}
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s, background-color 0.2s;
+    }
+    .hover-lift:hover {
+        background-color: #f8f9fa;
+        transform: translateY(-2px);
+        z-index: 1; 
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.05);
+    }
+</style>

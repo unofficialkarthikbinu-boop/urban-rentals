@@ -1,0 +1,51 @@
+    <footer class="footer">
+      <div class="d-sm-flex justify-content-center justify-content-sm-between">
+        <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright  2026 <a href="#" target="_blank">UrbanRentals</a>. All rights reserved.</span>
+        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Admin Panel </span>
+      </div>
+    </footer>
+    <!-- partial -->
+    </div>
+    <!-- main-panel ends -->
+  </div>
+  <!-- page-body-wrapper ends -->
+</div>
+<!-- container-scroller -->
+
+<!-- Bootstrap 5 Bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Custom JS for Sidebar -->
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+  }
+
+  // Close sidebar when clicking outside on mobile
+  document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const toggler = document.querySelector('.navbar-toggler-right');
+    
+    if (window.innerWidth < 991) {
+        if (!sidebar.contains(event.target) && !toggler.contains(event.target) && sidebar.classList.contains('active')) {
+            sidebar.classList.remove('active');
+        }
+    }
+  });
+</script>
+
+</body>
+</html>
+
+<script>
+  // Handle Desktop Sidebar Toggle (Minimize/Expand)
+  document.querySelector('[data-toggle="minimize"]').addEventListener('click', function() {
+    document.body.classList.toggle('sidebar-icon-only');
+  });
+
+  // Handle Mobile Sidebar Toggle (Offcanvas)
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+    document.querySelector('.page-body-wrapper').classList.toggle('sidebar-open');
+  }
+</script>

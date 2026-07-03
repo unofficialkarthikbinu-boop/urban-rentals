@@ -1,0 +1,582 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Returns & Pickups | UrbanRentals</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Nunito:300,300i,400,400i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'vendor/assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'vendor/assets/vendor/remixicon/remixicon.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+    /* Theme Variables */
+    :root {
+      --vendor-primary: #0B2447;
+      --vendor-secondary: #19376D;
+      --vendor-accent: #576CBC;
+      --vendor-light: #A5D7E8;
+      --vendor-surface: #ffffff;
+      --vendor-bg: #f0f2f5;
+      --text-primary: #2c3e50;
+      --text-secondary: #6c757d;
+      --success: #198754;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #0dcaf0;
+    }
+
+    body {
+      background-color: var(--vendor-bg);
+      font-family: 'Poppins', sans-serif;
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      margin: 0;
+      padding: 0;
+    }
+
+    main {
+      flex: 1;
+      padding-top: 100px;
+      padding-bottom: 40px;
+      display: block;
+      width: 100%;
+      background-color: var(--vendor-bg);
+    }
+
+    /* Page Header */
+    .page-header {
+      background: linear-gradient(135deg, var(--vendor-primary) 0%, var(--vendor-secondary) 100%);
+      color: white;
+      padding: 2.5rem 0;
+      margin-bottom: 2rem;
+      border-radius: 0 0 1.5rem 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .page-header h1 {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      font-size: 2rem;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+    }
+
+    .page-header h1 i {
+      color: #ffffff;
+    }
+
+    .page-header p {
+      opacity: 0.95;
+      font-size: 1.1rem;
+      margin-bottom: 0;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    /* Dashboard Card */
+    .dashboard-card {
+      background: var(--vendor-surface);
+      border-radius: 1rem;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      overflow: hidden;
+      margin-bottom: 2rem;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .dashboard-card:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, rgba(11, 36, 71, 0.02) 0%, rgba(25, 55, 109, 0.02) 100%);
+      border-bottom: 2px solid var(--vendor-accent);
+      padding: 1.75rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--vendor-primary);
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      letter-spacing: -0.3px;
+    }
+
+    /* Stats Cards */
+    .stat-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      height: 100%;
+      border-left: 5px solid transparent;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .stat-card.pending { border-left-color: var(--warning); }
+    .stat-card.pending:hover { background: linear-gradient(135deg, rgba(255, 193, 7, 0.02) 0%, rgba(255, 193, 7, 0.01) 100%); }
+
+    .stat-card.scheduled { border-left-color: var(--info); }
+    .stat-card.scheduled:hover { background: linear-gradient(135deg, rgba(13, 202, 240, 0.02) 0%, rgba(13, 202, 240, 0.01) 100%); }
+
+    .stat-card.picked { border-left-color: var(--vendor-primary); }
+    .stat-card.picked:hover { background: linear-gradient(135deg, rgba(11, 36, 71, 0.02) 0%, rgba(11, 36, 71, 0.01) 100%); }
+
+    .stat-card.completed { border-left-color: var(--success); }
+    .stat-card.completed:hover { background: linear-gradient(135deg, rgba(25, 135, 84, 0.02) 0%, rgba(25, 135, 84, 0.01) 100%); }
+
+    .stat-value {
+      font-size: 2.5rem;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 0.75rem;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Tabs */
+    .nav-tabs-custom {
+      border-bottom: 2px solid #dee2e6;
+      margin-bottom: 0;
+      padding: 0.5rem 2rem 0 2rem;
+      background: linear-gradient(to right, rgba(11, 36, 71, 0.01), rgba(25, 55, 109, 0.01));
+    }
+    
+    .nav-tabs-custom .nav-link {
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--text-secondary);
+      font-weight: 600;
+      padding: 1rem 1.5rem;
+      transition: all 0.3s ease;
+      position: relative;
+      margin-right: 0.5rem;
+      font-size: 0.95rem;
+    }
+    
+    .nav-tabs-custom .nav-link:hover {
+      color: var(--vendor-primary);
+      border-bottom-color: rgba(87, 107, 203, 0.3);
+      background-color: rgba(87, 107, 203, 0.05);
+    }
+    
+    .nav-tabs-custom .nav-link.active {
+      color: var(--vendor-primary);
+      border-bottom-color: var(--vendor-accent);
+      background: white;
+      font-weight: 700;
+    }
+
+    .nav-badge {
+      margin-left: 0.5rem;
+      font-size: 0.7rem;
+      padding: 0.4em 0.7em;
+      border-radius: 50rem;
+      font-weight: 700;
+      display: inline-block;
+    }
+
+    /* Table */
+    .table-custom th {
+      background-color: #f8f9fa;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 1rem 1.5rem;
+      border-bottom: 2px solid #dee2e6;
+    }
+
+    .table-custom td {
+      padding: 1rem 1.5rem;
+      vertical-align: middle;
+      font-size: 0.95rem;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .table-custom tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .table-custom tr:last-child td {
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .status-badge {
+      padding: 0.5em 1em;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .card-body {
+      padding: 0;
+    }
+
+    .tab-content {
+      background: white;
+    }
+
+    .tab-pane {
+      animation: fadeIn 0.3s ease-in;
+      padding: 1.5rem 2rem;
+    }
+
+    .table-responsive {
+      margin-bottom: 0;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    /* Empty State */
+    .text-center.py-5 {
+      padding: 3rem 2rem !important;
+    }
+
+    .text-center.py-5 .bi {
+      opacity: 0.6;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  {% include 'Vendor/header.html' %}
+
+  <main>
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="container">
+        <h1><i class="bi bi-arrow-return-left me-3"></i>Return Requests</h1>
+        <p>Manage product returns, schedule pickups, and process refunds.</p>
+      </div>
+    </div>
+
+    <div class="container">
+      
+      <!-- Messages -->
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i> {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Status Stats -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card pending">
+            <div class="stat-value text-warning">{{ pending.count }}</div>
+            <div class="stat-label">Pending Reviews</div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card scheduled">
+            <div class="stat-value text-info">{{ scheduled.count }}</div>
+            <div class="stat-label">Scheduled Pickups</div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card picked">
+            <div class="stat-value text-primary">{{ picked_up.count }}</div>
+            <div class="stat-label">Picked Up</div>
+          </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+          <div class="stat-card completed">
+            <div class="stat-value text-success">{{ completed.count }}</div>
+            <div class="stat-label">Completed Returns</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content Card -->
+      <div class="dashboard-card">
+        <div class="card-header border-0 pb-0">
+          <h2 class="card-title"><i class="bi bi-box-seam me-2" style="color: var(--vendor-accent); margin-left: 0.5rem; margin-top: 0.25rem;"></i>Returns Management</h2>
+        </div>
+        
+        <!-- Custom Tabs -->
+        <ul class="nav nav-tabs nav-tabs-custom" id="returnTabs" role="tablist">
+          <li class="nav-item">
+            <button class="nav-link active" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending-content" type="button" role="tab">
+               Pending <span class="badge bg-warning text-dark nav-badge">{{ pending.count }}</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="scheduled-tab" data-bs-toggle="tab" data-bs-target="#scheduled-content" type="button" role="tab">
+               Scheduled <span class="badge bg-info text-dark nav-badge">{{ scheduled.count }}</span>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button class="nav-link" id="completed-tab" data-bs-toggle="tab" data-bs-target="#completed-content" type="button" role="tab">
+               Completed <span class="badge bg-success nav-badge">{{ completed.count }}</span>
+            </button>
+          </li>
+        </ul>
+
+        <div class="card-body pt-0">
+          <div class="tab-content" id="returnTabContent">
+            
+            <!-- Pending Requests Tab -->
+            <div class="tab-pane fade show active" id="pending-content" role="tabpanel">
+              {% if pending %}
+              <div class="table-responsive">
+                <table class="table table-custom table-hover align-middle">
+                  <thead>
+                    <tr>
+                      <th>Return ID</th>
+                      <th>Customer Details</th>
+                      <th>Product</th>
+                      <th>Deposit</th>
+                      <th>Request Date</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for return in pending %}
+                    <tr>
+                      <td><span class="fw-bold text-primary">#{{ return.return_id }}</span></td>
+                      <td>
+                        <div class="d-flex flex-column">
+                          <span class="fw-bold">{{ return.customer.name }}</span>
+                          <small class="text-muted">{{ return.customer.phone }}</small>
+                        </div>
+                      </td>
+                      <td>{{ return.order_item.product.product_name }}</td>
+                      <td>₹{{ return.order_item.security_deposit }}</td>
+                      <td>{{ return.request_date|date:"M d, Y" }}</td>
+                      <td class="text-end">
+                        <button class="btn btn-primary btn-sm" onclick="schedulePickup('{{ return.return_id }}')">
+                          <i class="bi bi-calendar-event me-1"></i> Schedule Pickup
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="text-center py-5">
+                 <i class="bi bi-inbox fs-1 text-muted opacity-50"></i>
+                 <p class="mt-2 text-muted">No pending return requests found.</p>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Scheduled Tab -->
+            <div class="tab-pane fade" id="scheduled-content" role="tabpanel">
+              {% if scheduled %}
+              <div class="table-responsive">
+                <table class="table table-custom table-hover align-middle">
+                  <thead>
+                    <tr>
+                      <th>Return ID</th>
+                      <th>Customer</th>
+                      <th>Product</th>
+                      <th>Scheduled Date</th>
+                      <th>Status</th>
+                      <th class="text-end">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for return in scheduled %}
+                    <tr>
+                      <td><span class="fw-bold text-primary">#{{ return.return_id }}</span></td>
+                      <td>{{ return.customer.name }}</td>
+                      <td>{{ return.order_item.product.product_name }}</td>
+                      <td>
+                        <div class="d-flex flex-column">
+                           <span class="fw-bold text-dark">{{ return.pickup_scheduled_date|date:"M d, Y" }}</span>
+                           <small class="text-muted">{{ return.pickup_scheduled_date|date:"h:i A" }}</small>
+                        </div>
+                      </td>
+                      <td><span class="badge bg-info text-dark">Scheduled</span></td>
+                      <td class="text-end">
+                        <a href="{% url 'complete_pickup' return.return_id %}" class="btn btn-success btn-sm text-white">
+                          <i class="bi bi-check-circle me-1"></i> Complete Pickup
+                        </a>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              {% else %}
+              <div class="text-center py-5">
+                 <i class="bi bi-calendar-check fs-1 text-muted opacity-50"></i>
+                 <p class="mt-2 text-muted">No scheduled pickups at the moment.</p>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Completed Tab -->
+            <div class="tab-pane fade" id="completed-content" role="tabpanel">
+               {% if completed %}
+               <div class="table-responsive">
+                 <table class="table table-custom table-hover align-middle">
+                   <thead>
+                     <tr>
+                       <th>Return ID</th>
+                       <th>Product</th>
+                       <th>Condition</th>
+                       <th>Deductions</th>
+                       <th>Refund Amount</th>
+                       <th>Date</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     {% for return in completed %}
+                     <tr>
+                       <td><span class="col-form-label">#{{ return.return_id }}</span></td>
+                       <td>{{ return.order_item.product.product_name }}</td>
+                       <td>
+                           {% if return.defect_status == 'no_defect' %}
+                               <span class="badge bg-success">No Defect</span>
+                           {% elif return.defect_status == 'minor' %}
+                               <span class="badge bg-info">Minor (5%)</span>
+                           {% elif return.defect_status == 'moderate' %}
+                               <span class="badge bg-warning text-dark">Moderate (15%)</span>
+                           {% else %}
+                               <span class="badge bg-danger">Major (30%)</span>
+                           {% endif %}
+                       </td>
+                       <td>
+                          <div class="small">
+                             <div>Defect: <span class="text-danger">-₹{{ return.defect_deduction_amount }}</span></div>
+                             <div>Delay: <span class="text-danger">-₹{{ return.extra_days_deduction_amount }}</span></div>
+                          </div>
+                       </td>
+                       <td><span class="fw-bold text-success fs-6">₹{{ return.refund_amount }}</span></td>
+                       <td>{{ return.updated_at|date:"M d, Y" }}</td>
+                     </tr>
+                     {% endfor %}
+                   </tbody>
+                 </table>
+               </div>
+               {% else %}
+               <div class="text-center py-5">
+                  <i class="bi bi-clipboard-check fs-1 text-muted opacity-50"></i>
+                  <p class="mt-2 text-muted">No completed returns history available.</p>
+               </div>
+               {% endif %}
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Schedule Pickup Modal -->
+  <div class="modal fade" id="scheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="bi bi-calendar-plus me-2"></i>Schedule Pickup</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="scheduleForm" method="POST">
+          {% csrf_token %}
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label for="pickupDate" class="form-label fw-bold">Select Pickup Date & Time</label>
+              <input type="datetime-local" class="form-control form-control-lg" id="pickupDate" name="pickup_scheduled_date" required>
+              <div class="form-text">Choose a convenient time for the pickup agent.</div>
+            </div>
+          </div>
+          <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4">Confirm Schedule</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  {% include 'Vendor/footer.html' %}
+
+  <!-- Vendor JS -->
+  <script src="{% static 'vendor/assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Initialize modal
+      const scheduleModalEl = document.getElementById('scheduleModal');
+      const scheduleModal = new bootstrap.Modal(scheduleModalEl);
+      
+      // Global function to open modal
+      window.schedulePickup = function(returnId) {
+          // Safe URL construction - assuming '0' is a valid placeholder for the URL pattern
+          // If 'schedule_pickup' requires an ID, we use 0 and replace it.
+          const baseUrl = "{% url 'schedule_pickup' 0 %}";
+          const actionUrl = baseUrl.replace('/0/', '/' + returnId + '/');
+          
+          const form = document.getElementById('scheduleForm');
+          form.action = actionUrl;
+          
+          scheduleModal.show();
+      };
+  });
+  </script>
+
+</body>
+</html>

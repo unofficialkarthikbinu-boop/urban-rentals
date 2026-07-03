@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Verified - UrbanRentals</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 0; color: #1f2937; line-height: 1.6; }
+        .container { max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .header { background-color: #ffffff; padding: 40px 30px; text-align: center; border-bottom: 3px solid #0ea5e9; }
+        .logo { font-size: 24px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: 2px; margin: 0; }
+        .content { padding: 40px 30px; text-align: center; }
+        .icon-circle { display: inline-flex; align-items: center; justify-content: center; width: 80px; height: 80px; background-color: #dbeafe; color: #2563eb; border-radius: 50%; margin-bottom: 24px; font-size: 40px; }
+        .title { font-size: 24px; font-weight: 700; color: #111827; margin-bottom: 16px; }
+        .text { font-size: 16px; color: #4b5563; margin-bottom: 32px; max-width: 480px; margin-left: auto; margin-right: auto; }
+        .btn { display: inline-block; background-color: #0f172a; color: #ffffff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 16px; transition: background-color 0.2s; }
+        .btn:hover { background-color: #334155; }
+        .footer { background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e5e7eb; }
+        .footer p { font-size: 12px; color: #9ca3af; margin: 0; }
+        .features { display: flex; justify-content: space-between; margin-top: 40px; text-align: left; border-top: 1px solid #f3f4f6; padding-top: 30px; }
+        .feature-item { width: 30%; text-align: center; }
+        .feature-icon { font-size: 24px; margin-bottom: 8px; display: block; }
+        .feature-title { font-size: 14px; font-weight: 600; color: #374151; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">Urban Rentals</h1>
+        </div>
+        <div class="content">
+            <div class="icon-circle">✓</div>
+            <h2 class="title">You're Verified!</h2>
+            <p class="text">
+                Hello {{ customer.name }},<br>
+                Great news! Your account has been successfully verified. You now have full access to explore, rent, and enjoy our premium catalog.
+            </p>
+            <a href="{{ login_url }}" class="btn">Start Renting</a>
+
+            <div class="features">
+                <div class="feature-item">
+                    <span class="feature-icon">🏠</span>
+                    <span class="feature-title">Quality Furniture</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <span class="feature-title">Fast Delivery</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🛡️</span>
+                    <span class="feature-title">Secure Payments</span>
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <p>Questions? Contact us at <a href="mailto:support@urbanrentals.com" style="color: #0ea5e9; text-decoration: none;">support@urbanrentals.com</a></p>
+            <p style="margin-top: 10px;">&copy; {% now "Y" %} Urban Rentals. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

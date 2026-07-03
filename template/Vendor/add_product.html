@@ -1,0 +1,798 @@
+{% load static %}
+{% include "Vendor/header.html" %}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+<style>
+    :root {
+        --primary: var(--vendor-secondary);
+        --secondary: var(--vendor-primary);
+        --accent: var(--vendor-accent);
+        --bg-color: #f4f6f9;
+        --card-bg: #ffffff;
+        --text-color: #333;
+        --text-muted: #6c757d;
+        --border-color: #e2e8f0;
+        --input-bg: #f8fafc;
+        --radius: 12px;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    body {
+        background-color: var(--bg-color) !important;
+        font-family: 'Poppins', sans-serif;
+        color: var(--text-color);
+        line-height: 1.6;
+    }
+
+    .main-content-wrapper {
+        padding: 150px 0 60px;
+        min-height: 100vh;
+    }
+    
+    .form-header-section {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .form-header-section h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--secondary);
+        display: inline-flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .form-header-section h1 i {
+        color: var(--primary);
+    }
+
+    .form-header-section p {
+        color: var(--text-muted);
+        font-size: 1.1rem;
+    }
+
+    .form-card {
+        background: var(--card-bg);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-lg);
+        max-width: 950px;
+        margin: 0 auto;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .form-banner {
+        background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
+        padding: 40px;
+        color: white;
+        position: relative;
+    }
+    
+    .form-banner h2 {
+        color: white;
+        margin: 0 0 10px;
+        font-weight: 600;
+        font-size: 1.75rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .form-banner p {
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+        font-size: 0.95rem;
+    }
+
+    .form-container {
+        padding: 40px;
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+        background: #fff;
+        border-radius: 8px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid var(--border-color);
+        color: var(--secondary);
+    }
+
+    .section-title i {
+        background: rgba(var(--vendor-rgb), 0.1);
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        color: var(--primary);
+        font-size: 1.2rem;
+        background-color: #eef2ff;
+    }
+
+    .section-title h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin: 0;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 8px;
+        color: var(--secondary);
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .form-label .required {
+        color: var(--danger);
+        margin-left: 2px;
+    }
+
+    .form-hint {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 4px;
+        font-weight: 400;
+    }
+
+    .form-control, .form-select {
+        display: block;
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--text-color);
+        background-color: var(--input-bg);
+        background-clip: padding-box;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.15s;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        outline: 0;
+        box-shadow: 0 0 0 3px rgba(11, 36, 71, 0.1);
+        background-color: #fff;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    .grid-2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+    }
+    
+    /* Specific fix for Brand and Condition alignment */
+    .grid-2.align-bottom {
+        align-items: end;
+    }
+
+
+    .brand-condition-row {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+    }
+
+    .brand-group {
+        flex: 1;
+    }
+
+    .condition-group {
+        flex: 1;
+    }
+    
+    .form-label .required {
+        color: #ff0000 !important; /* Force bright red */
+        margin-left: 2px;
+        font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+        .brand-condition-row {
+            flex-direction: column;
+            gap: 0;
+        }
+        .brand-group, .condition-group {
+            flex: 1;
+            width: 100%;
+        }
+    }
+
+    .image-upload-wrapper {
+        border: 2px dashed var(--border-color);
+        border-radius: var(--radius);
+        padding: 40px;
+        text-align: center;
+        background-color: var(--input-bg);
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .image-upload-wrapper:hover {
+        border-color: var(--primary);
+        background-color: #f0f4ff;
+    }
+
+    .image-upload-wrapper i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 15px;
+        opacity: 0.8;
+    }
+
+    .pricing-tip {
+        background-color: #f0f9ff;
+        border-left: 4px solid #0ea5e9;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 25px;
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+    }
+
+    .pricing-tip i {
+        color: #0ea5e9;
+        font-size: 1.2rem;
+        margin-top: 3px;
+    }
+    
+    .pricing-tip h4 {
+        margin: 0 0 4px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #0c4a6e;
+    }
+    
+    .pricing-tip p {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #334155;
+    }
+
+    .input-group-text {
+        background-color: #e2e8f0;
+        border: 1px solid var(--border-color);
+        color: var(--text-muted);
+    }
+    
+    .currency-input {
+        position: relative;
+    }
+    
+    .currency-input::before {
+        content: '₹';
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-weight: 500;
+        z-index: 5;
+    }
+    
+    .currency-input input {
+        padding-left: 35px;
+    }
+
+    .form-actions {
+        margin-top: 40px;
+        padding-top: 30px;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 28px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 1rem;
+        transition: all 0.2s;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-secondary {
+        background-color: #fff;
+        color: var(--text-muted);
+        border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+        background-color: #f8fafc;
+        color: var(--text-color);
+        border-color: #cbd5e1;
+    }
+
+    .btn-primary {
+        background-color: var(--primary);
+        color: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    .btn-primary:hover {
+        background-color: var(--secondary);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+    }
+    
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .alert-danger {
+        color: #842029;
+        background-color: #f8d7da;
+        border-color: #f5c2c7;
+    }
+
+    .dynamic-section {
+        display: none;
+        animation: fadeIn 0.4s ease;
+    }
+
+    .dynamic-section.show {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+<div class="main-content-wrapper">
+    <div class="container">
+        <!-- <div class="form-header-section">
+            <h1><i class="fas fa-box-open"></i> Add New Product</h1>
+            <p>Expand your inventory by listing a new item for rent</p>
+        </div> -->
+
+        <div class="form-card">
+            <div class="form-banner">
+                <h2><i class="fas fa-info-circle"></i> Product Information</h2>
+                <p>Please provide detailed information to help customers find your product.</p>
+            </div>
+
+            <div class="form-container">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-triangle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- SECTION 1: CATEGORY -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-layer-group"></i>
+                            <h3>Category & Classification</h3>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Category <span class="required">*</span></label>
+                                <select name="category" id="category" class="form-select" required onchange="updateSubcategories()">
+                                    <option value="">-- Select Category --</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.category_id }}" {% if form_data.category and form_data.category == category.category_id|stringformat:"d" %}selected{% endif %}>
+                                            {{ category.category_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                                <span class="form-hint">Select the main category of your product</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Sub-Category <span class="required">*</span></label>
+                                <select name="subcategory" id="subcategory" class="form-select" required>
+                                    <option value="">-- Select Category First --</option>
+                                </select>
+                                <span class="form-hint">Choose a specific subcategory</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2: BASIC INFO -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>Basic Details</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Product Name <span class="required">*</span></label>
+                            <input type="text" name="product_name" id="product_name" class="form-control"
+                                placeholder="e.g. Premium Wooden Dining Table" required maxlength="150"
+                                value="{{ form_data.product_name|default:'' }}">
+                            <span class="form-hint">Be clear and descriptive with your product name</span>
+                        </div>
+
+                        <div class="brand-condition-row">
+                            <div class="form-group brand-group">
+                                <label class="form-label">Brand</label>
+                                <input type="text" name="brand" id="brand" class="form-control brand-input"
+                                    placeholder="e.g. IKEA" maxlength="100"
+                                    value="{{ form_data.brand|default:'' }}">
+                                <span class="form-hint">Optional</span>
+                            </div>
+
+                            <div class="form-group condition-group">
+                                <label class="form-label">Condition <span class="required">*</span></label>
+                                <select name="condition" class="form-select" required>
+                                    <option value="">-- Select Condition --</option>
+                                    <option value="New" {% if form_data.condition == 'New' %}selected{% endif %}>New</option>
+                                    <option value="Like New" {% if form_data.condition == 'Like New' %}selected{% endif %}>Like New</option>
+                                    <option value="Good" {% if form_data.condition == 'Good' %}selected{% endif %}>Good</option>
+                                    <option value="Fair" {% if form_data.condition == 'Fair' %}selected{% endif %}>Fair</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Product Description <span class="required">*</span></label>
+                            <textarea name="product_description" id="product_description" class="form-control"
+                                placeholder="Describe features, material, age, and other relevant details..." required>{{ form_data.product_description|default:'' }}</textarea>
+                            <span class="form-hint">Provide detailed information to attract customers</span>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 3: IMAGES -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-images"></i>
+                            <h3>Product Images</h3>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Main Product Image <span class="required">*</span></label>
+                            <div class="image-upload-wrapper" onclick="document.getElementById('product_image').click()">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <h4>Click to Upload Image</h4>
+                                <p class="text-muted">or drag and drop your image here</p>
+                                <input type="file" name="product_image" id="product_image"
+                                    accept="image/jpeg,image/png,image/webp" required onchange="previewImage(event)"
+                                    style="display: none;">
+                            </div>
+                            <span class="form-hint mt-2">High-quality images increase rental chances. Max 5MB.</span>
+                            
+                            <div class="image-preview mt-3" id="imagePreviewContainer" style="display:none; text-align: center;">
+                                <img id="imagePreview" alt="Preview" style="max-height: 250px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Additional Gallery Images</label>
+                            <input type="file" name="additional_images" class="form-control" multiple accept="image/*">
+                            <span class="form-hint">Optional - Add up to 5 more images</span>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 4: PRICING -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-tags"></i>
+                            <h3>Pricing Strategy</h3>
+                        </div>
+
+                        <div class="pricing-tip">
+                            <i class="fas fa-lightbulb"></i>
+                            <div>
+                                <h4>Pricing Tip</h4>
+                                <p>Setting both daily and monthly rates gives customers more flexibility and increases rental opportunities.</p>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Daily Rental Price</label>
+                                <div class="currency-input">
+                                    <input type="number" name="rent_price_per_day" id="rent_price_per_day"
+                                        class="form-control" placeholder="0.00" step="0.01" min="0"
+                                        value="{{ form_data.rent_price_per_day|default:'' }}">
+                                </div>
+                                <span class="form-hint">Leave empty if you don't rent per day</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Monthly Rental Price</label>
+                                <div class="currency-input">
+                                    <input type="number" name="rent_price_per_month" id="rent_price_per_month"
+                                        class="form-control" placeholder="0.00" step="0.01" min="0"
+                                        value="{{ form_data.rent_price_per_month|default:'' }}">
+                                </div>
+                                <span class="form-hint">Leave empty if you don't rent per month</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Security Deposit</label>
+                            <div class="currency-input">
+                                <input type="number" name="security_deposit" id="security_deposit"
+                                    class="form-control" placeholder="0.00" step="0.01" min="0"
+                                    value="{{ form_data.security_deposit|default:'0' }}">
+                            </div>
+                            <span class="form-hint">Refundable amount collected from customer</span>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 5: FURNITURE DETAILS (Dynamic) -->
+                    <div class="form-section dynamic-section" id="furniture-section">
+                        <div class="section-title">
+                            <i class="fas fa-couch"></i>
+                            <h3>Furniture Specifications</h3>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Furniture Type <span class="required">*</span></label>
+                                <input type="text" name="furniture_type" id="furniture_type"
+                                    class="form-control" placeholder="e.g. Sofa, Bed, Chair"
+                                    value="{{ form_data.furniture_type|default:'' }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Dimensions <span class="required">*</span></label>
+                                <input type="text" name="furniture_size" id="furniture_size"
+                                    class="form-control" placeholder="e.g. 6x4 ft, 200x150 cm"
+                                    value="{{ form_data.furniture_size|default:'' }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Material <span class="required">*</span></label>
+                                <input type="text" name="furniture_material" id="furniture_material"
+                                    class="form-control" placeholder="e.g. Teak Wood, Leather"
+                                    value="{{ form_data.furniture_material|default:'' }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Thickness/Width</label>
+                                <input type="text" name="furniture_thickness" id="furniture_thickness"
+                                    class="form-control" placeholder="e.g. 12mm, 5 inches"
+                                    value="{{ form_data.furniture_thickness|default:'' }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Special Features</label>
+                            <textarea name="furniture_features" id="furniture_features" class="form-control"
+                                rows="3" placeholder="e.g. Water resistant, Foldable, Storage included">{{ form_data.furniture_features|default:'' }}</textarea>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 6: APPLIANCE DETAILS (Dynamic) -->
+                    <div class="form-section dynamic-section" id="appliance-section">
+                        <div class="section-title">
+                            <i class="fas fa-tv"></i>
+                            <h3>Appliance Specifications</h3>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Operation Type <span class="required">*</span></label>
+                                <select name="appliance_type" id="appliance_type" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="Manual" {% if form_data.appliance_type == 'Manual' %}selected{% endif %}>Manual</option>
+                                    <option value="Semi-Automatic" {% if form_data.appliance_type == 'Semi-Automatic' %}selected{% endif %}>Semi-Automatic</option>
+                                    <option value="Fully Automatic" {% if form_data.appliance_type == 'Fully Automatic' %}selected{% endif %}>Fully Automatic</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Power Rating <span class="required">*</span></label>
+                                <input type="text" name="appliance_power_rating" id="appliance_power_rating"
+                                    class="form-control" placeholder="e.g. 1500W, 5 Star"
+                                    value="{{ form_data.appliance_power_rating|default:'' }}">
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Voltage <span class="required">*</span></label>
+                                <select name="appliance_voltage" id="appliance_voltage" class="form-select">
+                                    <option value="">-- Select --</option>
+                                    <option value="110V" {% if form_data.appliance_voltage == '110V' %}selected{% endif %}>110V</option>
+                                    <option value="220V" {% if form_data.appliance_voltage == '220V' %}selected{% endif %}>220V</option>
+                                    <option value="240V" {% if form_data.appliance_voltage == '240V' %}selected{% endif %}>240V</option>
+                                    <option value="Universal" {% if form_data.appliance_voltage == 'Universal' %}selected{% endif %}>Universal (110-240V)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Warranty Period</label>
+                                <input type="text" name="appliance_warranty" id="appliance_warranty"
+                                    class="form-control" placeholder="e.g. 1 Year Manufacturer"
+                                    value="{{ form_data.appliance_warranty|default:'' }}">
+                                <span class="form-hint">Mention only if valid warranty exists</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 7: INVENTORY -->
+                    <div class="form-section">
+                        <div class="section-title">
+                            <i class="fas fa-cubes"></i>
+                            <h3>Inventory Management</h3>
+                        </div>
+
+                        <div class="form-group" style="max-width: 300px;">
+                            <label class="form-label">Quantity Available <span class="required">*</span></label>
+                            <input type="number" name="stock_quantity" id="stock_quantity" class="form-control"
+                                placeholder="1" min="1" required
+                                value="{{ form_data.stock_quantity|default:'1' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <a href="{% url 'vendor_products' %}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check-circle"></i> Publish Product
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "vendor/footer.html" %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function updateSubcategories() {
+        const categorySelect = document.getElementById('category');
+        const subcategorySelect = document.getElementById('subcategory');
+        const categoryId = categorySelect.value;
+        const categoryName = categorySelect.options[categorySelect.selectedIndex]?.text || '';
+
+        if (!categoryId) {
+            subcategorySelect.innerHTML = '<option value="">-- Select Category First --</option>';
+            hideDynamicSections();
+            return;
+        }
+
+        showDynamicSections(categoryName);
+
+        fetch(`{% url 'get_subcategories' %}?category_id=${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+                subcategorySelect.innerHTML = '<option value="">-- Select Sub-Category --</option>';
+                data.subcategories.forEach(subcat => {
+                    const option = document.createElement('option');
+                    option.value = subcat.subcategory_id;
+                    option.textContent = subcat.subcategory_name;
+                    subcategorySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    function showDynamicSections(categoryName) {
+        const furnitureSection = document.getElementById('furniture-section');
+        const applianceSection = document.getElementById('appliance-section');
+
+        furnitureSection.classList.remove('show');
+        applianceSection.classList.remove('show');
+
+        if (categoryName.toLowerCase().includes('furniture')) {
+            furnitureSection.classList.add('show');
+            toggleRequired('furniture', true);
+            toggleRequired('appliance', false);
+        } else if (categoryName.toLowerCase().includes('appliance')) {
+            applianceSection.classList.add('show');
+            toggleRequired('appliance', true);
+            toggleRequired('furniture', false);
+        } else {
+            toggleRequired('furniture', false);
+            toggleRequired('appliance', false);
+        }
+    }
+
+    function toggleRequired(type, isRequired) {
+        if (type === 'furniture') {
+            document.getElementById('furniture_type').required = isRequired;
+            document.getElementById('furniture_size').required = isRequired;
+            document.getElementById('furniture_material').required = isRequired;
+        } else if (type === 'appliance') {
+            document.getElementById('appliance_type').required = isRequired;
+            document.getElementById('appliance_power_rating').required = isRequired;
+            document.getElementById('appliance_voltage').required = isRequired;
+        }
+    }
+
+    function hideDynamicSections() {
+        document.getElementById('furniture-section').classList.remove('show');
+        document.getElementById('appliance-section').classList.remove('show');
+        toggleRequired('furniture', false);
+        toggleRequired('appliance', false);
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+        reader.onload = function() {
+            const preview = document.getElementById('imagePreview');
+            const container = document.getElementById('imagePreviewContainer');
+            preview.src = reader.result;
+            container.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+
+    window.addEventListener('load', function() {
+        const categorySelect = document.getElementById('category');
+        if (categorySelect.value) {
+            const categoryName = categorySelect.options[categorySelect.selectedIndex]?.text || '';
+            showDynamicSections(categoryName);
+        }
+    });
+
+    const uploadBox = document.querySelector('.image-upload-box');
+    if (uploadBox) {
+        uploadBox.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = 'var(--primary)';
+            uploadBox.style.backgroundColor = 'rgba(65, 84, 241, 0.1)';
+        });
+
+        uploadBox.addEventListener('dragleave', () => {
+            uploadBox.style.borderColor = 'var(--border-color)';
+            uploadBox.style.backgroundColor = '#fafbff';
+        });
+
+        uploadBox.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadBox.style.borderColor = 'var(--border-color)';
+            uploadBox.style.backgroundColor = '#fafbff';
+            const fileInput = document.getElementById('product_image');
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                const event = new Event('change');
+                fileInput.dispatchEvent(event);
+            }
+        });
+    }
+</script>

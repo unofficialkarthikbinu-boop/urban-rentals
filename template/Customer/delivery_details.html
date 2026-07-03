@@ -1,0 +1,393 @@
+{% load static %}
+{% include "Customer/header.html" %}
+
+<main class="pt-5">
+  <div class="container py-5">
+    <!-- Page Header -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'customer_home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'view_cart' %}">Cart</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Delivery Address</li>
+      </ol>
+    </nav>
+
+    {% if messages %}
+      <div class="alert-container mb-4">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="row g-4">
+      <!-- Main Form Section -->
+      <div class="col-lg-8">
+        <div class="delivery-form-section">
+          <h3 class="display-6 fw-bold mb-4">Enter Delivery Address</h3>
+
+          <form method="POST" class="delivery-form">
+            {% csrf_token %}
+            <!-- Hidden field to track selected address -->
+            <input type="hidden" id="selected_address_id" name="selected_address_id" value="">
+
+            <!-- Personal Information -->
+            <div class="form-section mb-4">
+              <h5 class="mb-3">Personal Information</h5>
+              <div class="row g-3">
+                <div class="col-md-12">
+                  <label for="full_name" class="form-label">Full Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-lg rounded-3 non-editable" id="full_name" name="full_name" 
+                         value="{{ customer.name }}" required placeholder="Enter your full name" readonly>
+                </div>
+                <div class="col-md-12">
+                  <label for="phone_number" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control form-control-lg rounded-3 non-editable" id="phone_number" name="phone_number" 
+                         value="{{ customer.phone }}" required placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" readonly>
+                  <small class="text-muted">Enter 10-digit mobile number without country code</small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Address Information -->
+            <div class="form-section mb-4">
+              <h5 class="mb-3">Address Information</h5>
+              <div class="row g-3">
+                <div class="col-md-12">
+                  <label for="address_line_1" class="form-label">Address Line 1 <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="address_line_1" name="address_line_1" 
+                         required placeholder="House No., Building Name">
+                </div>
+                <div class="col-md-12">
+                  <label for="address_line_2" class="form-label">Address Line 2 (Optional)</label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="address_line_2" name="address_line_2" 
+                         placeholder="Road name, Area, Colony">
+                </div>
+                <div class="col-md-6">
+                  <label for="city" class="form-label">City/Town <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="city" name="city" 
+                         required placeholder="Enter city or town">
+                </div>
+                <div class="col-md-6">
+                  <label for="district" class="form-label">District</label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="district" name="district" 
+                         placeholder="Enter district (optional)">
+                </div>
+                <div class="col-md-6">
+                  <label for="state" class="form-label">State <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="state" name="state" 
+                         required placeholder="Enter state">
+                </div>
+                <div class="col-md-6">
+                  <label for="pincode" class="form-label">Pincode <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="pincode" name="pincode" 
+                         pattern="^\d{6}$" title="Enter exactly 6 digits" maxlength="6" required placeholder="6-digit pincode">
+                  <small class="text-muted">Enter 6-digit postal code</small>
+                </div>
+                <div class="col-md-12">
+                  <label for="landmark" class="form-label">Landmark (Optional)</label>
+                  <input type="text" class="form-control form-control-lg rounded-3" id="landmark" name="landmark" 
+                         placeholder="e.g., Near XYZ Hospital, Behind ABC School">
+                </div>
+              </div>
+            </div>
+
+            <!-- Set as Default -->
+            <div class="form-section mb-4">
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="is_default" name="is_default">
+                  <label class="form-check-label" for="is_default">
+                    Set as default delivery address
+                  </label>
+                </div>
+                {% if saved_addresses %}
+                  <button type="button" class="btn btn-sm btn-outline-secondary" onclick="clearAddressForm()">
+                    ✕ Clear & Enter New Address
+                  </button>
+                {% endif %}
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg rounded-3">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" class="me-2">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2Zm0 16H5V5h14v14Zm-5.04-6.71l-2.75 3.54-2.16-2.66c-.44-.53-1.25-.58-1.78-.15-.53.43-.58 1.25-.15 1.78l3 3.73c.29.38.77.59 1.27.59.5 0 .98-.21 1.27-.59l4-5.15c.43-.53.38-1.35-.15-1.78-.53-.43-1.35-.38-1.78.15l-1.36 1.75Z"/>
+                </svg>
+                Save & Continue to Checkout
+              </button>
+              <a href="{% url 'view_cart' %}" class="btn btn-outline-secondary btn-lg rounded-3">
+                ← Back to Cart
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Saved Addresses Sidebar -->
+      <div class="col-lg-4">
+        {% if saved_addresses %}
+          <div class="saved-addresses-section">
+            <h5 class="fw-bold mb-3">Saved Addresses</h5>
+            <div class="address-list">
+              {% for address in saved_addresses %}
+                <div class="address-card bg-light p-3 rounded-3 mb-3 address-selectable" 
+                     onclick="fillAddressForm(event, '{{ address.full_name }}', '{{ address.phone_number }}', '{{ address.address_line_1 }}', '{{ address.address_line_2 }}', '{{ address.city }}', '{{ address.district }}', '{{ address.state }}', '{{ address.pincode }}', '{{ address.landmark }}')"
+                     style="cursor: pointer; position: relative;"
+                     data-address-id="{{ address.address_id }}">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6 class="mb-0">{{ address.full_name }}</h6>
+                    {% if address.is_default %}
+                      <span class="badge bg-success">Default</span>
+                    {% endif %}
+                  </div>
+                  <p class="small mb-2">
+                    {{ address.address_line_1 }}
+                    {% if address.address_line_2 %}<br>{{ address.address_line_2 }}{% endif %}
+                    <br>{{ address.city }}, {{ address.state }} - {{ address.pincode }}
+                  </p>
+                  <small class="text-muted">📱 {{ address.phone_number }}</small>
+                  {% if address.landmark %}
+                    <br><small class="text-muted">🏙️ {{ address.landmark }}</small>
+                  {% endif %}
+                  
+                  <!-- Action Buttons -->
+                  <div class="mt-3 d-flex gap-2">
+                    {% if not address.is_default %}
+                      <form method="POST" action="{% url 'set_default_address' address.address_id %}" style="display: inline;" onclick="event.stopPropagation();">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="me-1">
+                            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                          </svg>
+                          Set as Default
+                        </button>
+                      </form>
+                    {% endif %}
+                    <form method="POST" action="{% url 'delete_address' address.address_id %}" style="display: inline;" onclick="event.stopPropagation();">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this address?');">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="me-1">
+                          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-9l-1 1H5v2h14V4z"/>
+                        </svg>
+                        Delete
+                      </button>
+                    </form>
+                  </div>
+                  
+                  <div class="selected-indicator" style="position: absolute; top: -5px; right: -5px; display: none;">
+                    <span class="badge bg-primary">Selected ✓</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            <div class="alert alert-info small mt-3 rounded-3" role="alert">
+              <strong>Tip:</strong> You can add multiple delivery addresses. Mark one as default for quick checkout next time.
+            </div>
+          </div>
+        {% else %}
+          <div class="empty-state text-center p-4">
+            <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" class="mb-3 text-muted">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/>
+              <path d="M7 10h10M7 14h10M7 18h6"/>
+            </svg>
+            <p class="text-muted">No saved addresses yet</p>
+            <small>Add your first delivery address above</small>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+
+{% include "Customer/footer.html" %}
+
+<style>
+  .breadcrumb {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 0.5rem;
+  }
+
+  .breadcrumb-item a {
+    text-decoration: none;
+    color: #0d6efd;
+  }
+
+  .breadcrumb-item a:hover {
+    text-decoration: underline;
+  }
+
+  .delivery-form-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .form-section {
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .form-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .form-label {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .form-control {
+    color: #000000;
+  }
+
+  .form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+  }
+
+  .form-control.non-editable {
+    color: #6c757d;
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+  }
+
+  .form-control.non-editable:focus {
+    background-color: #f8f9fa;
+    color: #6c757d;
+  }
+
+  .address-card {
+    border-left: 4px solid #0d6efd;
+    transition: all 0.3s ease;
+  }
+
+  .address-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .address-selectable {
+    cursor: pointer;
+  }
+
+  .address-selectable:hover {
+    background-color: #e8f2ff !important;
+    border-left: 4px solid #0056b3;
+  }
+
+  .address-selectable.selected {
+    background-color: #cfe2ff !important;
+    border-left: 4px solid #0056b3;
+    box-shadow: inset 0 0 0 1px #0d6efd;
+  }
+
+  .empty-state {
+    background: white;
+    border-radius: 1rem;
+    border: 2px dashed #e9ecef;
+  }
+
+  .text-danger {
+    color: #dc3545;
+  }
+
+  @media (max-width: 768px) {
+    .delivery-form-section {
+      padding: 1.5rem;
+    }
+
+    .saved-addresses-section {
+      margin-top: 2rem;
+    }
+  }
+</style>
+
+<script>
+  // Phone number validation
+  document.getElementById('phone_number').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value.length > 10) {
+      this.value = this.value.slice(0, 10);
+    }
+  });
+
+  // Pincode validation
+  document.getElementById('pincode').addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value.length > 6) {
+      this.value = this.value.slice(0, 6);
+    }
+  });
+
+  // Fill form with selected address
+  function fillAddressForm(event, fullName, phoneNumber, addressLine1, addressLine2, city, district, state, pincode, landmark) {
+    // Prevent event bubbling for nested elements
+    if (event && event.target.closest('form')) {
+      return;
+    }
+
+    // Remove previous selection
+    document.querySelectorAll('.address-selectable').forEach(card => {
+      card.classList.remove('selected');
+      const indicator = card.querySelector('.selected-indicator');
+      if (indicator) indicator.style.display = 'none';
+    });
+
+    // Mark current card as selected
+    const cardElement = event.currentTarget;
+    cardElement.classList.add('selected');
+    const indicator = cardElement.querySelector('.selected-indicator');
+    if (indicator) indicator.style.display = 'block';
+
+    // Set the selected address ID
+    const addressId = cardElement.getAttribute('data-address-id');
+    document.getElementById('selected_address_id').value = addressId;
+
+    // Populate form fields
+    document.getElementById('full_name').value = fullName || '';
+    document.getElementById('phone_number').value = phoneNumber || '';
+    document.getElementById('address_line_1').value = addressLine1 || '';
+    document.getElementById('address_line_2').value = addressLine2 || '';
+    document.getElementById('city').value = city || '';
+    document.getElementById('district').value = district || '';
+    document.getElementById('state').value = state || '';
+    document.getElementById('pincode').value = pincode || '';
+    document.getElementById('landmark').value = landmark || '';
+
+    // Scroll to form
+    document.querySelector('.delivery-form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Clear form and reset selection
+  function clearAddressForm() {
+    // Reset all form fields
+    document.getElementById('full_name').value = '{{ customer.name }}' || '';
+    document.getElementById('phone_number').value = '{{ customer.phone }}' || '';
+    document.getElementById('address_line_1').value = '';
+    document.getElementById('address_line_2').value = '';
+    document.getElementById('city').value = '';
+    document.getElementById('district').value = '';
+    document.getElementById('state').value = '';
+    document.getElementById('pincode').value = '';
+    document.getElementById('landmark').value = '';
+    document.getElementById('is_default').checked = false;
+    document.getElementById('selected_address_id').value = '';
+
+    // Remove selection from all address cards
+    document.querySelectorAll('.address-selectable').forEach(card => {
+      card.classList.remove('selected');
+      const indicator = card.querySelector('.selected-indicator');
+      if (indicator) indicator.style.display = 'none';
+    });
+
+    // Scroll to form
+    document.querySelector('.delivery-form-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+</script>

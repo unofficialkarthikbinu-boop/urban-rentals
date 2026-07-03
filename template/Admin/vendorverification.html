@@ -1,0 +1,179 @@
+{% load static %}
+{% include "Admin/header.html" %}
+
+<div class="main-panel">
+    <div class="content-wrapper">
+        <div class="row">
+            <div class="col-12 grid-margin stretch-card">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 class="card-title">Vendor Verification</h4>
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Total: {{ vendors.count }}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- ALERT MESSAGES -->
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+
+                        <!-- STATS SECTION -->
+                        <div class="row mb-4">
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-success text-white h-100">
+                                    <div class="card-body">
+                                        <h4 class="fw-normal mb-3">Approved</h4>
+                                        <h2 class="mb-0">{{ approved_count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-warning text-white h-100">
+                                    <div class="card-body">
+                                        <h4 class="fw-normal mb-3">Pending</h4>
+                                        <h2 class="mb-0">{{ pending_count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-danger text-white h-100">
+                                    <div class="card-body">
+                                        <h4 class="fw-normal mb-3">Rejected</h4>
+                                        <h2 class="mb-0">{{ rejected_count }}</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TABLE CONTAINER -->
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Owner Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>Location</th>
+                                        <th class="text-center">GSTIN</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vendor in vendors %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td><span class="fw-bold">{{ vendor.name }}</span></td>
+                                        <td><a href="mailto:{{ vendor.email }}" class="text-decoration-none">{{ vendor.email }}</a></td>
+                                        <td>{{ vendor.phone }}</td>
+                                        <td><small class="text-muted">{{ vendor.location.location_name|default:"N/A" }}</small></td>
+                                        <td class="text-center">
+                                            {% if vendor.gstin %}
+                                                <span class="badge bg-success">{{ vendor.gstin }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">Not Provided</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            {% if vendor.status == 'Approved' %}
+                                                <span class="badge bg-success">Approved</span>
+                                            {% elif vendor.status == 'Rejected' %}
+                                                <span class="badge bg-danger">Rejected</span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
+                                                <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#vendorModal{{ vendor.vendor_id }}" title="View Details">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </button>
+                                                
+                                                {% if vendor.status == 'Pending' %}
+                                                    <a href="{% url 'approve_vendor' vendor.vendor_id %}" class="btn btn-success btn-sm" title="Approve">
+                                                        <i class="fa-solid fa-check"></i>
+                                                    </a>
+                                                    <a href="{% url 'reject_vendor' vendor.vendor_id %}" class="btn btn-danger btn-sm" title="Reject">
+                                                        <i class="fa-solid fa-xmark"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="8" class="text-center py-5">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="fa-solid fa-store-slash text-muted mb-3" style="font-size: 3rem;"></i>
+                                                <p class="text-muted">No Vendors Found</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include "Admin/footer.html" %}
+</div>
+
+<!-- Vendor Detail Modals -->
+{% for vendor in vendors %}
+<div class="modal fade" id="vendorModal{{ vendor.vendor_id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Vendor Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Name:</strong> {{ vendor.name }}</p>
+                        <p><strong>Email:</strong> {{ vendor.email }}</p>
+                        <p><strong>Phone:</strong> {{ vendor.phone }}</p>
+                    </div>
+                    <div class="col-md-6">
+                         <p><strong>Location:</strong> {{ vendor.location.location_name|default:"N/A" }}</p>
+                         <p><strong>Address:</strong> {{ vendor.address }}</p>
+                         <p><strong>GSTIN:</strong> {{ vendor.gstin }}</p>
+                    </div>
+                </div>
+                <hr>
+                <h6 class="fw-bold text-uppercase">Documents</h6>
+                <div class="row">
+                    {% if vendor.aadhar_proof %}
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted small">Aadhar Proof</p>
+                        <img src="{{ vendor.aadhar_proof.url }}" class="img-fluid rounded border" alt="Aadhar">
+                    </div>
+                    {% endif %}
+                    {% if vendor.shop_license %}
+                    <div class="col-md-6 mb-3">
+                        <p class="text-muted small">Shop License</p>
+                        <img src="{{ vendor.shop_license.url }}" class="img-fluid rounded border" alt="License">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
