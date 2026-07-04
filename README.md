@@ -68,7 +68,8 @@ MySQL
 
 Clone the repository
 
-git clone https://github.com/<your-username>/UrbanRentals.git
+git clone https://github.com/unofficialkarthikbinu-boop/urban-rentals.git 
+
 cd UrbanRentals
 
 **Create a virtual environment**
